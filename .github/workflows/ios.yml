@@ -11,7 +11,7 @@ jobs:
     name: Execute tests on iOS
     strategy:
       matrix:
-        os: [macos-14]
+        os: [macos-15]
         xcode-version: [16.0]
         ios-version: ["18.0"]
         ios-simulator-name: ["iPhone 16 Pro"]

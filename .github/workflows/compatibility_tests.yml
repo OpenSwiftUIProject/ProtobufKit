@@ -11,7 +11,7 @@ jobs:
     name: Execute compatibility tests for macOS
     strategy:
       matrix:
-        os: [macos-14]
+        os: [macos-15]
         xcode-version: ["16.0"]
     runs-on: ${{ matrix.os }}
     env:
@@ -32,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-14]
+        os: [macos-15]
         xcode-version: ["16.0"]
         ios-version: ["18.0"]
         ios-simulator-name: ["iPhone 16 Pro"]
@@ -47,9 +47,9 @@ jobs:
           xcode-version: ${{ matrix.xcode-version }}
       - name: Run compatibility tests
         run: |
-          ./Scripts/patch_sdk iphonesimulator SwiftUICore ./SDKPatches/patch.swiftinterface
+          ./Scripts/patch_sdk.sh iphonesimulator SwiftUICore ./SDKPatches/patch.swiftinterface
           xcodebuild test \
             -scheme ProtobufKit \
             -configuration Debug \
             -destination "platform=iOS Simulator,OS=${{ matrix.ios-version }},name=${{ matrix.ios-simulator-name }}"
-          ./Scripts/unpatch_sdk iphonesimulator SwiftUICore ./SDKPatches/patch.swiftinterface
+          ./Scripts/unpatch_sdk.sh iphonesimulator SwiftUICore ./SDKPatches/patch.swiftinterface

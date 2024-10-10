@@ -2,11 +2,11 @@
 
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FOpenSwiftUIProject%2FProtobufKit%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/OpenSwiftUIProject/ProtobufKit) [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FOpenSwiftUIProject%2FProtobufKit%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/OpenSwiftUIProject/ProtobufKit) [![codecov](https://codecov.io/gh/OpenSwiftUIProject/ProtobufKit/graph/badge.svg?token=VDKQVOP20I)](https://codecov.io/gh/OpenSwiftUIProject/ProtobufKit)
 
-ProtobufKit is a lightweight[^1] replacement of [swift-protobuf](https://github.com/apple/swift-protobuf) for working with Protocol Buffers in Swift.
+ProtobufKit is a lightweight[^1] replacement of [swift-protobuf](https://github.com/apple/swift-protobuf) for working with [Protocol Buffers](https://protobuf.dev/) serialization technology in Swift.
 
 ## Overview
 
-ProtobufKit is cross-platform Swift package on Darwin platform (without OS version limitation) and Linux.[^2]
+ProtobufKit is a **cross-platform** Swift package on Darwin platform (without OS version limitation) and Linux.[^2]
 
 | **Workflow** | **CI Status** |
 |-|:-|
@@ -15,7 +15,7 @@ ProtobufKit is cross-platform Swift package on Darwin platform (without OS versi
 | **iOS Unit Test** | [![iOS](https://github.com/OpenSwiftUIProject/ProtobufKit/actions/workflows/ios.yml/badge.svg)](https://github.com/OpenSwiftUIProject/ProtobufKit/actions/workflows/ios.yml) |
 | **Ubuntu 22.04 Unit Test** | [![Ubuntu](https://github.com/OpenSwiftUIProject/ProtobufKit/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/OpenSwiftUIProject/ProtobufKit/actions/workflows/ubuntu.yml) |
 
-ProtobufKit is compatible with SwiftUI's internal Protobuf implementation so that you can use it to decode some internal binary data of SwiftUI (eg. ArchivedView).
+*ProtobufKit is **compatible[^3] with the latest SwiftUI's internal Protobuf implementation** so that you can use it to decode some internal binary data of SwiftUI (eg. ArchivedView).*
 
 The core design of ProtobufKit is `ProtobufMessage` which is similar to `Codable` and easy to customize.
 
@@ -30,7 +30,7 @@ public protocol ProtobufDecodableMessage {
 public typealias ProtobufMessage = ProtobufDecodableMessage & ProtobufEncodableMessage
 ```
 
-You can also use it with Codable by conforming your message type to `CodaleByProtobuf` or annoate your message instance with `ProtobufCodable` propertyWrapper.
+You can also use it with `Codable` by conforming your message type to `CodaleByProtobuf` or annoate your message instance with `ProtobufCodable` propertyWrapper.
 
 ## Getting Started
 
@@ -82,7 +82,16 @@ for more detailed information about the library.
 
 ## Future work
 
-ProtobufKit does not have compiler build-in support like Codable`'s `Codable` protocol, so you have to write the encode and decode logic by yourself. This can be improved by future macro API support.
+ProtobufKit does not have compiler build-in support like `Codable`, so you have to write the encode and decode logic by yourself.
+
+This can be improved by future macro API like the following.
+
+```swift
+struct SimpleMessage: ProtobufMessage {
+    @Field(tag: 1, type: .bool)
+    var value: Bool
+}
+```
 
 ## License
 
@@ -104,3 +113,4 @@ See LICENSE file - MIT
 
 [^1]: Under macOS + Build for profiling option, ProtobufKit's ProtobufKit.o is 142KB while [swift-protobuf](https://github.com/apple/swift-protobuf)'s SwiftProtobuf.o is 5.7MB
 [^2]: WASI support will be added in the future
+[^3]: Compatibility with SwiftUI may break in the future SwiftUI release

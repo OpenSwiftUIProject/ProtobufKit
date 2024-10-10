@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -x
-
 # A `realpath` alternative using the default C implementation.
 filepath() {
   [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
@@ -41,4 +39,4 @@ cp -r $SOURCE_DIR/* $SOURCE_DES/
 mkdir -p $TEST_DEST
 cp -r $TEST_DIR/* $TEST_DEST/
 
-# rm -rf REPO_DIR
+rm -rf $REPO_DIR

@@ -13,7 +13,6 @@ jobs:
       matrix:
         os: [macos-14]
         xcode-version: ["16.0"]
-        release: [2024]
     runs-on: ${{ matrix.os }}
     env:
       PROTOBUFKIT_SWIFTUI_COMPATIBILITY_TEST: 1
@@ -36,7 +35,7 @@ jobs:
         os: [macos-14]
         xcode-version: ["16.0"]
         ios-version: ["18.0"]
-        ios-simulator-name: "iPhone 16 Pro"
+        ios-simulator-name: ["iPhone 16 Pro"]
     runs-on: ${{ matrix.os }}
     env:
       PROTOBUFKIT_SWIFTUI_COMPATIBILITY_TEST: 1

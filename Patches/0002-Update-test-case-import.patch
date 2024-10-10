@@ -1,0 +1,92 @@
+From 1af8f26681eed9d4283d0910da4559ec11bae33b Mon Sep 17 00:00:00 2001
+From: Kyle <kyle201817146@gmail.com>
+Date: Fri, 11 Oct 2024 01:28:44 +0800
+Subject: [PATCH] Update test case import
+
+---
+ .../Data/Protobuf/ProtobufDecoderTests.swift              | 8 ++++++--
+ .../Data/Protobuf/ProtobufEncoderTests.swift              | 8 ++++++--
+ .../Data/Protobuf/ProtobufMessageTests.swift              | 8 ++++++--
+ .../Data/Protobuf/ProtobufTestHelper.swift                | 8 ++++++--
+ 4 files changed, 24 insertions(+), 8 deletions(-)
+
+diff --git a/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufDecoderTests.swift b/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufDecoderTests.swift
+index 6cfa17b..4cdd371 100644
+--- a/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufDecoderTests.swift
++++ b/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufDecoderTests.swift
+@@ -1,8 +1,12 @@
+ //
+ //  ProtobufDecoderTests.swift
+-//  OpenSwiftUICoreTests
++//  ProtobufKitTests
+ 
+-import OpenSwiftUICore
++#if PROTOBUFKIT_SWIFTUI_COMPATIBILITY_TEST
++import SwiftUI
++#else
++import ProtobufKit
++#endif
+ import Testing
+ import Foundation
+ 
+diff --git a/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufEncoderTests.swift b/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufEncoderTests.swift
+index 510cc54..fe6af0a 100644
+--- a/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufEncoderTests.swift
++++ b/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufEncoderTests.swift
+@@ -1,8 +1,12 @@
+ //
+ //  ProtobufEncoderTests.swift
+-//  OpenSwiftUICoreTests
++//  ProtobufKitTests
+ 
+-import OpenSwiftUICore
++#if PROTOBUFKIT_SWIFTUI_COMPATIBILITY_TEST
++import SwiftUI
++#else
++import ProtobufKit
++#endif
+ import Testing
+ import Foundation
+ 
+diff --git a/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufMessageTests.swift b/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufMessageTests.swift
+index e5bb00f..e0a6e57 100644
+--- a/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufMessageTests.swift
++++ b/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufMessageTests.swift
+@@ -1,8 +1,12 @@
+ //
+ //  ProtobufMessageTests.swift
+-//  OpenSwiftUICoreTests
++//  ProtobufKitTests
+ 
+-import OpenSwiftUICore
++#if PROTOBUFKIT_SWIFTUI_COMPATIBILITY_TEST
++import SwiftUI
++#else
++import ProtobufKit
++#endif
+ import Testing
+ 
+ struct ProtobufMessageTests {}
+diff --git a/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufTestHelper.swift b/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufTestHelper.swift
+index 02dab15..9c7b7b1 100644
+--- a/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufTestHelper.swift
++++ b/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufTestHelper.swift
+@@ -1,9 +1,13 @@
+ //
+ //  ProtobufTestHelper.swift
+-//  OpenSwiftUICoreTests
++//  ProtobufKitTests
+ 
+ import Foundation
+-import OpenSwiftUICore
++#if PROTOBUFKIT_SWIFTUI_COMPATIBILITY_TEST
++import SwiftUI
++#else
++import ProtobufKit
++#endif
+ 
+ // MARK: - Message Types
+ 
+-- 
+2.39.5 (Apple Git-154)
+

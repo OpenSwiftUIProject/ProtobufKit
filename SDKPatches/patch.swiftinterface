@@ -1,0 +1,303 @@
+
+/* PROTOBUFKIT_PATCH_BEGIN */
+
+public protocol ProtobufEncodableMessage {
+  func encode(to encoder: inout SwiftUICore.ProtobufEncoder) throws
+}
+public protocol ProtobufDecodableMessage {
+  init(from decoder: inout SwiftUICore.ProtobufDecoder) throws
+}
+public typealias ProtobufMessage = SwiftUICore.ProtobufDecodableMessage & SwiftUICore.ProtobufEncodableMessage
+public protocol ProtobufEnum {
+  var protobufValue: Swift.UInt { get }
+  #if compiler(>=5.3) && $NoncopyableGenerics
+  init?(protobufValue: Swift.UInt)
+  #else
+  init?(protobufValue: Swift.UInt)
+  #endif
+}
+extension SwiftUICore.ProtobufEnum where Self : Swift.RawRepresentable, Self.RawValue : Swift.BinaryInteger {
+  public var protobufValue: Swift.UInt {
+    get
+  }
+  #if compiler(>=5.3) && $NoncopyableGenerics
+  public init?(protobufValue: Swift.UInt)
+  #else
+  public init?(protobufValue: Swift.UInt)
+  #endif
+}
+public protocol ProtobufTag : Swift.Equatable {
+  var rawValue: Swift.UInt { get }
+  init(rawValue: Swift.UInt)
+}
+public enum ProtobufFormat {
+  public struct WireType : Swift.Equatable {
+    public let rawValue: Swift.UInt
+    public init(rawValue: Swift.UInt)
+    public static var varint: SwiftUICore.ProtobufFormat.WireType {
+      get
+    }
+    public static var fixed64: SwiftUICore.ProtobufFormat.WireType {
+      get
+    }
+    public static var lengthDelimited: SwiftUICore.ProtobufFormat.WireType {
+      get
+    }
+    public static var fixed32: SwiftUICore.ProtobufFormat.WireType {
+      get
+    }
+    public static func == (a: SwiftUICore.ProtobufFormat.WireType, b: SwiftUICore.ProtobufFormat.WireType) -> Swift.Bool
+  }
+  public struct Field : Swift.Equatable {
+    public var rawValue: Swift.UInt
+    public init(rawValue: Swift.UInt)
+    public init(_ tag: Swift.UInt, wireType: SwiftUICore.ProtobufFormat.WireType)
+    public var tag: Swift.UInt {
+      get
+    }
+    public var wireType: SwiftUICore.ProtobufFormat.WireType {
+      get
+    }
+    public var _isEmpty: Swift.Bool {
+      get
+    }
+    @inline(__always) public func tag<T>(as: T.Type = T.self) -> T where T : SwiftUICore.ProtobufTag
+    public static func == (a: SwiftUICore.ProtobufFormat.Field, b: SwiftUICore.ProtobufFormat.Field) -> Swift.Bool
+  }
+}
+public protocol CodableByProtobuf : Swift.Decodable, Swift.Encodable, SwiftUICore.ProtobufDecodableMessage, SwiftUICore.ProtobufEncodableMessage {
+}
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+@_originallyDefinedIn(module: "SwiftUI", iOS 18.0)
+@_originallyDefinedIn(module: "SwiftUI", macOS 15.0)
+@_originallyDefinedIn(module: "SwiftUI", tvOS 18.0)
+@_originallyDefinedIn(module: "SwiftUI", watchOS 11.0)
+extension SwiftUICore.CodableByProtobuf {
+  public func encode(to encoder: any Swift.Encoder) throws
+  public init(from decoder: any Swift.Decoder) throws
+}
+@propertyWrapper public struct ProtobufCodable<Value> : Swift.Codable where Value : SwiftUICore.ProtobufDecodableMessage, Value : SwiftUICore.ProtobufEncodableMessage {
+  public var wrappedValue: Value
+  public init(wrappedValue: Value)
+  public func encode(to encoder: any Swift.Encoder) throws
+  public init(from decoder: any Swift.Decoder) throws
+}
+extension SwiftUICore.ProtobufCodable : Swift.Equatable where Value : Swift.Equatable {
+  public static func == (lhs: SwiftUICore.ProtobufCodable<Value>, rhs: SwiftUICore.ProtobufCodable<Value>) -> Swift.Bool
+}
+
+public struct ProtobufEncoder {
+  public enum EncodingError : Swift.Error {
+    case failed
+    public static func == (a: SwiftUICore.ProtobufEncoder.EncodingError, b: SwiftUICore.ProtobufEncoder.EncodingError) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+  public typealias Field = SwiftUICore.ProtobufFormat.Field
+  public typealias WireType = SwiftUICore.ProtobufFormat.WireType
+  public var userInfo: [Swift.CodingUserInfoKey : Any]
+  public static func encoding(_ body: (inout SwiftUICore.ProtobufEncoder) throws -> Swift.Void) rethrows -> Foundation.Data
+  public static func encoding<T>(_ value: T) throws -> Foundation.Data where T : SwiftUICore.ProtobufEncodableMessage
+}
+extension SwiftUICore.ProtobufEncoder {
+  #if compiler(>=5.3) && $NoncopyableGenerics
+  @inline(__always) public mutating func boolField(_ tag: Swift.UInt, _ value: Swift.Bool, defaultValue: Swift.Bool? = false)
+  #else
+  @inline(__always) public mutating func boolField(_ tag: Swift.UInt, _ value: Swift.Bool, defaultValue: Swift.Bool? = false)
+  #endif
+  #if compiler(>=5.3) && $NoncopyableGenerics
+  @inline(__always) public mutating func uintField(_ tag: Swift.UInt, _ value: Swift.UInt, defaultValue: Swift.UInt? = 0)
+  #else
+  @inline(__always) public mutating func uintField(_ tag: Swift.UInt, _ value: Swift.UInt, defaultValue: Swift.UInt? = 0)
+  #endif
+  #if compiler(>=5.3) && $NoncopyableGenerics
+  @inline(__always) public mutating func enumField<T>(_ tag: Swift.UInt, _ value: T, defaultValue: T?) where T : Swift.Equatable, T : SwiftUICore.ProtobufEnum
+  #else
+  @inline(__always) public mutating func enumField<T>(_ tag: Swift.UInt, _ value: T, defaultValue: T?) where T : Swift.Equatable, T : SwiftUICore.ProtobufEnum
+  #endif
+  @inline(__always) public mutating func enumField<T>(_ tag: Swift.UInt, _ value: T) where T : SwiftUICore.ProtobufEnum
+  #if compiler(>=5.3) && $NoncopyableGenerics
+  @inline(__always) public mutating func uint64Field(_ tag: Swift.UInt, _ value: Swift.UInt64, defaultValue: Swift.UInt64? = 0)
+  #else
+  @inline(__always) public mutating func uint64Field(_ tag: Swift.UInt, _ value: Swift.UInt64, defaultValue: Swift.UInt64? = 0)
+  #endif
+  #if compiler(>=5.3) && $NoncopyableGenerics
+  @inline(__always) public mutating func intField(_ tag: Swift.UInt, _ value: Swift.Int, defaultValue: Swift.Int? = 0)
+  #else
+  @inline(__always) public mutating func intField(_ tag: Swift.UInt, _ value: Swift.Int, defaultValue: Swift.Int? = 0)
+  #endif
+  #if compiler(>=5.3) && $NoncopyableGenerics
+  @inline(__always) public mutating func int64Field(_ tag: Swift.UInt, _ value: Swift.Int64, defaultValue: Swift.Int64? = 0)
+  #else
+  @inline(__always) public mutating func int64Field(_ tag: Swift.UInt, _ value: Swift.Int64, defaultValue: Swift.Int64? = 0)
+  #endif
+  #if compiler(>=5.3) && $NoncopyableGenerics
+  @inline(__always) public mutating func fixed32Field(_ tag: Swift.UInt, _ value: Swift.UInt32, defaultValue: Swift.UInt32? = 0)
+  #else
+  @inline(__always) public mutating func fixed32Field(_ tag: Swift.UInt, _ value: Swift.UInt32, defaultValue: Swift.UInt32? = 0)
+  #endif
+  #if compiler(>=5.3) && $NoncopyableGenerics
+  @inline(__always) public mutating func fixed64Field(_ tag: Swift.UInt, _ value: Swift.UInt64, defaultValue: Swift.UInt64? = 0)
+  #else
+  @inline(__always) public mutating func fixed64Field(_ tag: Swift.UInt, _ value: Swift.UInt64, defaultValue: Swift.UInt64? = 0)
+  #endif
+  #if compiler(>=5.3) && $NoncopyableGenerics
+  @inline(__always) public mutating func floatField(_ tag: Swift.UInt, _ value: Swift.Float, defaultValue: Swift.Float? = 0)
+  #else
+  @inline(__always) public mutating func floatField(_ tag: Swift.UInt, _ value: Swift.Float, defaultValue: Swift.Float? = 0)
+  #endif
+  #if compiler(>=5.3) && $NoncopyableGenerics
+  @inline(__always) public mutating func doubleField(_ tag: Swift.UInt, _ value: Swift.Double, defaultValue: Swift.Double? = 0)
+  #else
+  @inline(__always) public mutating func doubleField(_ tag: Swift.UInt, _ value: Swift.Double, defaultValue: Swift.Double? = 0)
+  #endif
+  #if compiler(>=5.3) && $NoncopyableGenerics
+  @inline(__always) public mutating func cgFloatField(_ tag: Swift.UInt, _ value: CoreFoundation.CGFloat, defaultValue: CoreFoundation.CGFloat? = 0)
+  #else
+  @inline(__always) public mutating func cgFloatField(_ tag: Swift.UInt, _ value: CoreFoundation.CGFloat, defaultValue: CoreFoundation.CGFloat? = 0)
+  #endif
+  public mutating func dataField(_ tag: Swift.UInt, _ data: Foundation.Data)
+  public mutating func dataField(_ tag: Swift.UInt, _ buffer: Swift.UnsafeRawBufferPointer)
+  @inline(__always) public mutating func packedField(_ tag: Swift.UInt, _ body: (inout SwiftUICore.ProtobufEncoder) -> Swift.Void)
+  @inline(__always) public mutating func messageField(_ tag: Swift.UInt, _ body: (inout SwiftUICore.ProtobufEncoder) throws -> Swift.Void) rethrows
+  @inline(__always) public mutating func messageField<T>(_ tag: Swift.UInt, _ value: T, defaultValue: T) throws where T : Swift.Equatable, T : SwiftUICore.ProtobufEncodableMessage
+  public mutating func messageField<T>(_ tag: Swift.UInt, _ value: T) throws where T : SwiftUICore.ProtobufEncodableMessage
+  #if compiler(>=5.3) && $NoncopyableGenerics
+  @inline(__always) public mutating func stringField(_ tag: Swift.UInt, _ value: Swift.String, defaultValue: Swift.String? = "") throws
+  #else
+  @inline(__always) public mutating func stringField(_ tag: Swift.UInt, _ value: Swift.String, defaultValue: Swift.String? = "") throws
+  #endif
+  @inline(__always) public mutating func codableField<T>(_ tag: Swift.UInt, _ value: T, defaultValue: T) throws where T : Swift.Encodable, T : Swift.Equatable
+  public mutating func codableField<T>(_ tag: Swift.UInt, _ value: T) throws where T : Swift.Encodable
+  public mutating func emptyField(_ tag: Swift.UInt)
+}
+extension SwiftUICore.ProtobufEncoder {
+  #if compiler(>=5.3) && $NoncopyableGenerics
+  @inline(__always) public mutating func boolField<T>(_ tag: T, _ value: Swift.Bool, defaultValue: Swift.Bool? = false) where T : SwiftUICore.ProtobufTag
+  #else
+  @inline(__always) public mutating func boolField<T>(_ tag: T, _ value: Swift.Bool, defaultValue: Swift.Bool? = false) where T : SwiftUICore.ProtobufTag
+  #endif
+  #if compiler(>=5.3) && $NoncopyableGenerics
+  @inline(__always) public mutating func uintField<T>(_ tag: T, _ value: Swift.UInt, defaultValue: Swift.UInt? = 0) where T : SwiftUICore.ProtobufTag
+  #else
+  @inline(__always) public mutating func uintField<T>(_ tag: T, _ value: Swift.UInt, defaultValue: Swift.UInt? = 0) where T : SwiftUICore.ProtobufTag
+  #endif
+  #if compiler(>=5.3) && $NoncopyableGenerics
+  @inline(__always) public mutating func enumField<T, U>(_ tag: T, _ value: U, defaultValue: U?) where T : SwiftUICore.ProtobufTag, U : Swift.Equatable, U : SwiftUICore.ProtobufEnum
+  #else
+  @inline(__always) public mutating func enumField<T, U>(_ tag: T, _ value: U, defaultValue: U?) where T : SwiftUICore.ProtobufTag, U : Swift.Equatable, U : SwiftUICore.ProtobufEnum
+  #endif
+  @inline(__always) public mutating func enumField<T, U>(_ tag: T, _ value: U) where T : SwiftUICore.ProtobufTag, U : SwiftUICore.ProtobufEnum
+  #if compiler(>=5.3) && $NoncopyableGenerics
+  @inline(__always) public mutating func uint64Field<T>(_ tag: T, _ value: Swift.UInt64, defaultValue: Swift.UInt64? = 0) where T : SwiftUICore.ProtobufTag
+  #else
+  @inline(__always) public mutating func uint64Field<T>(_ tag: T, _ value: Swift.UInt64, defaultValue: Swift.UInt64? = 0) where T : SwiftUICore.ProtobufTag
+  #endif
+  #if compiler(>=5.3) && $NoncopyableGenerics
+  @inline(__always) public mutating func intField<T>(_ tag: T, _ value: Swift.Int, defaultValue: Swift.Int? = 0) where T : SwiftUICore.ProtobufTag
+  #else
+  @inline(__always) public mutating func intField<T>(_ tag: T, _ value: Swift.Int, defaultValue: Swift.Int? = 0) where T : SwiftUICore.ProtobufTag
+  #endif
+  #if compiler(>=5.3) && $NoncopyableGenerics
+  @inline(__always) public mutating func int64Field<T>(_ tag: T, _ value: Swift.Int64, defaultValue: Swift.Int64? = 0) where T : SwiftUICore.ProtobufTag
+  #else
+  @inline(__always) public mutating func int64Field<T>(_ tag: T, _ value: Swift.Int64, defaultValue: Swift.Int64? = 0) where T : SwiftUICore.ProtobufTag
+  #endif
+  #if compiler(>=5.3) && $NoncopyableGenerics
+  @inline(__always) public mutating func fixed32Field<T>(_ tag: T, _ value: Swift.UInt32, defaultValue: Swift.UInt32? = 0) where T : SwiftUICore.ProtobufTag
+  #else
+  @inline(__always) public mutating func fixed32Field<T>(_ tag: T, _ value: Swift.UInt32, defaultValue: Swift.UInt32? = 0) where T : SwiftUICore.ProtobufTag
+  #endif
+  #if compiler(>=5.3) && $NoncopyableGenerics
+  @inline(__always) public mutating func fixed64Field<T>(_ tag: T, _ value: Swift.UInt64, defaultValue: Swift.UInt64? = 0) where T : SwiftUICore.ProtobufTag
+  #else
+  @inline(__always) public mutating func fixed64Field<T>(_ tag: T, _ value: Swift.UInt64, defaultValue: Swift.UInt64? = 0) where T : SwiftUICore.ProtobufTag
+  #endif
+  #if compiler(>=5.3) && $NoncopyableGenerics
+  @inline(__always) public mutating func floatField<T>(_ tag: T, _ value: Swift.Float, defaultValue: Swift.Float? = 0) where T : SwiftUICore.ProtobufTag
+  #else
+  @inline(__always) public mutating func floatField<T>(_ tag: T, _ value: Swift.Float, defaultValue: Swift.Float? = 0) where T : SwiftUICore.ProtobufTag
+  #endif
+  #if compiler(>=5.3) && $NoncopyableGenerics
+  @inline(__always) public mutating func doubleField<T>(_ tag: T, _ value: Swift.Double, defaultValue: Swift.Double? = 0) where T : SwiftUICore.ProtobufTag
+  #else
+  @inline(__always) public mutating func doubleField<T>(_ tag: T, _ value: Swift.Double, defaultValue: Swift.Double? = 0) where T : SwiftUICore.ProtobufTag
+  #endif
+  #if compiler(>=5.3) && $NoncopyableGenerics
+  @inline(__always) public mutating func cgFloatField<T>(_ tag: T, _ value: CoreFoundation.CGFloat, defaultValue: CoreFoundation.CGFloat? = 0) where T : SwiftUICore.ProtobufTag
+  #else
+  @inline(__always) public mutating func cgFloatField<T>(_ tag: T, _ value: CoreFoundation.CGFloat, defaultValue: CoreFoundation.CGFloat? = 0) where T : SwiftUICore.ProtobufTag
+  #endif
+  @inline(__always) public mutating func dataField<T>(_ tag: T, _ data: Foundation.Data) where T : SwiftUICore.ProtobufTag
+  @inline(__always) public mutating func dataField<T>(_ tag: T, _ buffer: Swift.UnsafeRawBufferPointer) where T : SwiftUICore.ProtobufTag
+  @inline(__always) public mutating func packedField<T>(_ tag: T, _ body: (inout SwiftUICore.ProtobufEncoder) -> Swift.Void) where T : SwiftUICore.ProtobufTag
+  @inline(__always) public mutating func messageField<T>(_ tag: T, _ body: (inout SwiftUICore.ProtobufEncoder) throws -> Swift.Void) rethrows where T : SwiftUICore.ProtobufTag
+  @inline(__always) public mutating func messageField<T, U>(_ tag: T, _ value: U) throws where T : SwiftUICore.ProtobufTag, U : SwiftUICore.ProtobufEncodableMessage
+  @inline(__always) public mutating func messageField<T, U>(_ tag: T, _ value: U, defaultValue: U) throws where T : SwiftUICore.ProtobufTag, U : Swift.Equatable, U : SwiftUICore.ProtobufEncodableMessage
+  #if compiler(>=5.3) && $NoncopyableGenerics
+  @inline(__always) public mutating func stringField<T>(_ tag: T, _ value: Swift.String, defaultValue: Swift.String? = "") throws where T : SwiftUICore.ProtobufTag
+  #else
+  @inline(__always) public mutating func stringField<T>(_ tag: T, _ value: Swift.String, defaultValue: Swift.String? = "") throws where T : SwiftUICore.ProtobufTag
+  #endif
+  @inline(__always) public mutating func codableField<T, U>(_ tag: T, _ value: U) throws where T : SwiftUICore.ProtobufTag, U : Swift.Encodable
+  @inline(__always) public mutating func codableField<T, U>(_ tag: T, _ value: U, defaultValue: U) throws where T : SwiftUICore.ProtobufTag, U : Swift.Encodable, U : Swift.Equatable
+}
+extension SwiftUICore.ProtobufEncoder {
+  public mutating func encodeVarint(_ value: Swift.UInt)
+  public mutating func encodeVarint64(_ value: Swift.UInt64)
+  public mutating func encodeVarintZZ(_ value: Swift.Int)
+  public mutating func encodeVarint64ZZ(_ value: Swift.Int64)
+  public mutating func encodeBool(_ value: Swift.Bool)
+  public mutating func encodeFixed32(_ value: Swift.UInt32)
+  public mutating func encodeFixed64(_ value: Swift.UInt64)
+  public mutating func encodeFloat(_ value: Swift.Float)
+}
+public struct ProtobufDecoder {
+  public enum DecodingError : Swift.Error {
+    case failed
+    public static func == (a: SwiftUICore.ProtobufDecoder.DecodingError, b: SwiftUICore.ProtobufDecoder.DecodingError) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+  public typealias Field = SwiftUICore.ProtobufFormat.Field
+  public typealias WireType = SwiftUICore.ProtobufFormat.WireType
+  public var userInfo: [Swift.CodingUserInfoKey : Any]
+  public init(_ data: Foundation.Data)
+}
+extension SwiftUICore.ProtobufDecoder {
+  #if compiler(>=5.3) && $NoncopyableGenerics
+  public mutating func nextField() throws -> SwiftUICore.ProtobufDecoder.Field?
+  #else
+  public mutating func nextField() throws -> SwiftUICore.ProtobufDecoder.Field?
+  #endif
+  public mutating func skipField(_ field: SwiftUICore.ProtobufDecoder.Field) throws
+  public mutating func boolField(_ field: SwiftUICore.ProtobufDecoder.Field) throws -> Swift.Bool
+  public mutating func uintField(_ field: SwiftUICore.ProtobufDecoder.Field) throws -> Swift.UInt
+  #if compiler(>=5.3) && $NoncopyableGenerics
+  public mutating func enumField<T>(_ field: SwiftUICore.ProtobufDecoder.Field) throws -> T? where T : SwiftUICore.ProtobufEnum
+  #else
+  public mutating func enumField<T>(_ field: SwiftUICore.ProtobufDecoder.Field) throws -> T? where T : SwiftUICore.ProtobufEnum
+  #endif
+  public mutating func uint8Field(_ field: SwiftUICore.ProtobufDecoder.Field) throws -> Swift.UInt8
+  public mutating func uint16Field(_ field: SwiftUICore.ProtobufDecoder.Field) throws -> Swift.UInt16
+  public mutating func uint32Field(_ field: SwiftUICore.ProtobufDecoder.Field) throws -> Swift.UInt32
+  public mutating func uint64Field(_ field: SwiftUICore.ProtobufDecoder.Field) throws -> Swift.UInt64
+  public mutating func intField(_ field: SwiftUICore.ProtobufDecoder.Field) throws -> Swift.Int
+  public mutating func fixed32Field(_ field: SwiftUICore.ProtobufDecoder.Field) throws -> Swift.UInt32
+  public mutating func fixed64Field(_ field: SwiftUICore.ProtobufDecoder.Field) throws -> Swift.UInt64
+  public mutating func floatField(_ field: SwiftUICore.ProtobufDecoder.Field) throws -> Swift.Float
+  public mutating func doubleField(_ field: SwiftUICore.ProtobufDecoder.Field) throws -> Swift.Double
+  @inline(__always) public mutating func cgFloatField(_ field: SwiftUICore.ProtobufDecoder.Field) throws -> CoreFoundation.CGFloat
+  public mutating func dataBufferField(_ field: SwiftUICore.ProtobufDecoder.Field) throws -> Swift.UnsafeRawBufferPointer
+  public mutating func dataField(_ field: SwiftUICore.ProtobufDecoder.Field) throws -> Foundation.Data
+  public mutating func messageField<T>(_ field: SwiftUICore.ProtobufDecoder.Field) throws -> T where T : SwiftUICore.ProtobufDecodableMessage
+  public mutating func messageField<T>(_ field: SwiftUICore.ProtobufDecoder.Field, _ body: (inout SwiftUICore.ProtobufDecoder) throws -> T) throws -> T
+  public mutating func stringField(_ field: SwiftUICore.ProtobufDecoder.Field) throws -> Swift.String
+  public mutating func codableField<T>(_ field: SwiftUICore.ProtobufDecoder.Field) throws -> T where T : Swift.Decodable
+}
+
+/* PROTOBUFKIT_PATCH_END */

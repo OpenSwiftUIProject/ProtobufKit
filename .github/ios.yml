@@ -1,0 +1,34 @@
+name: iOS 
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ios_test:
+    name: Execute tests on iOS
+    strategy:
+      matrix:
+        os: [macos-14]
+        xcode-version: [16.0]
+        ios-version: ["18.0"]
+        ios-simulator-name: ["iPhone 16 Pro"]
+    runs-on: ${{ matrix.os }}
+    env:
+      PROTOBUFKIT_SWIFTUI_COMPATIBILITY_TEST: 0
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ matrix.xcode-version }}
+      - name: Swift version
+        run: swift --version
+      - name: Run test target in debug mode
+        run: |
+          xcodebuild test \
+            -scheme ProtobufKit \
+            -configuration Debug \
+            -destination "platform=iOS Simulator,OS=${{ matrix.ios-version }},name=${{ matrix.ios-simulator-name }}"

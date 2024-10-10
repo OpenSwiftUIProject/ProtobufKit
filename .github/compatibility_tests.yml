@@ -1,0 +1,56 @@
+name: Compatibility tests 
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  compatibility_tests_macos:
+    name: Execute compatibility tests for macOS
+    strategy:
+      matrix:
+        os: [macos-14]
+        xcode-version: ["16.0"]
+        release: [2024]
+    runs-on: ${{ matrix.os }}
+    env:
+      PROTOBUFKIT_SWIFTUI_COMPATIBILITY_TEST: 1
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ matrix.xcode-version }}
+      - name: Run compatibility tests
+        run: |
+          ./Scripts/patch_sdk.sh macosx SwiftUICore ./SDKPatches/patch.swiftinterface
+          swift test
+          ./Scripts/unpatch_sdk.sh macosx SwiftUICore ./SDKPatches/patch.swiftinterface
+  compatibility_tests_ios:
+    name: Execute compatibility tests for iOS
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14]
+        xcode-version: ["16.0"]
+        ios-version: ["18.0"]
+        ios-simulator-name: "iPhone 16 Pro"
+    runs-on: ${{ matrix.os }}
+    env:
+      PROTOBUFKIT_SWIFTUI_COMPATIBILITY_TEST: 1
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ matrix.xcode-version }}
+      - name: Run compatibility tests
+        run: |
+          ./Scripts/patch_sdk iphonesimulator SwiftUICore ./SDKPatches/patch.swiftinterface
+          xcodebuild test \
+            -scheme ProtobufKit \
+            -configuration Debug \
+            -destination "platform=iOS Simulator,OS=${{ matrix.ios-version }},name=${{ matrix.ios-simulator-name }}"
+          ./Scripts/unpatch_sdk iphonesimulator SwiftUICore ./SDKPatches/patch.swiftinterface

@@ -1,0 +1,23 @@
+name: Ubuntu 
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ubuntu_test:
+    name: Execute tests on Ubuntu
+    strategy:
+      matrix:
+        swift_version: ["6.0.1"]
+    runs-on: ubuntu-22.04
+    env:
+      PROTOBUFKIT_SWIFTUI_COMPATIBILITY_TEST: 0
+    container: swift:${{ matrix.swift_version }}-jammy
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test
+        run: |
+          swift test

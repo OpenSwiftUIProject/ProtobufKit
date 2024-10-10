@@ -29,14 +29,9 @@ if compatibilityTestCondition {
 
 let package = Package(
     name: "ProtobufKit",
-    products: [
-        .library(name: "ProtobufKit", targets: ["ProtobufKit"]),
-    ],
+    products: [.library(name: "ProtobufKit", targets: ["ProtobufKit"]),],
     targets: [
-        .target(
-            name: "ProtobufKit"),
-        .testTarget(
-            name: "ProtobufKitTests",
-            dependencies: ["ProtobufKit"]),
+        .target(name: "ProtobufKit"),
+        testTarget,    
     ]
 )

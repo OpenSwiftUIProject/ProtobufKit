@@ -27,9 +27,21 @@ if compatibilityTestCondition {
     testTarget.dependencies.append("ProtobufKit")
 }
 
+let libraryType: Product.Library.LibraryType?
+switch Context.environment["PROTOBUFKIT_LIBRARY_TYPE"] {
+case "dynamic":
+    libraryType = .dynamic
+case "static":
+    libraryType = .static
+default:
+    libraryType = nil
+}
+
 let package = Package(
     name: "ProtobufKit",
-    products: [.library(name: "ProtobufKit", targets: ["ProtobufKit"]),],
+    products: [
+        .library(name: "ProtobufKit", type: libraryType, targets: ["ProtobufKit"]),
+    ],
     targets: [
         .target(name: "ProtobufKit"),
         testTarget,    

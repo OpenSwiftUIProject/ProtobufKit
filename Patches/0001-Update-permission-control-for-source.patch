@@ -1,19 +1,19 @@
-From c01b2d0338016573d50f3702e6f373b26d4ab364 Mon Sep 17 00:00:00 2001
+From 97c19450444211b2376beb4803c66c300f95593a Mon Sep 17 00:00:00 2001
 From: Kyle <kyle201817146@gmail.com>
-Date: Fri, 11 Oct 2024 01:26:22 +0800
+Date: Wed, 30 Oct 2024 13:51:49 +0800
 Subject: [PATCH] Update permission control for source
 
 ---
- .../Data/Protobuf/ProtobufDecoder.swift       |  60 ++++-----
- .../Data/Protobuf/ProtobufEncoder.swift       | 122 +++++++++---------
- .../Data/Protobuf/ProtobufMessage.swift       |  63 +++++----
- 3 files changed, 117 insertions(+), 128 deletions(-)
+ .../Data/Protobuf/ProtobufDecoder.swift       |  60 ++++----
+ .../Data/Protobuf/ProtobufEncoder.swift       | 128 +++++++++---------
+ .../Data/Protobuf/ProtobufMessage.swift       |  63 ++++-----
+ 3 files changed, 120 insertions(+), 131 deletions(-)
 
 diff --git a/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufDecoder.swift b/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufDecoder.swift
-index 83990f8..bea21d8 100644
+index ef3572a..13ab6c3 100644
 --- a/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufDecoder.swift
 +++ b/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufDecoder.swift
-@@ -1,20 +1,16 @@
+@@ -1,25 +1,21 @@
  //
  //  ProtobufDecoder.swift
 -//  OpenSwiftUICore
@@ -25,194 +25,229 @@ index 83990f8..bea21d8 100644
  
  import Foundation
  
+ /// An object that decodes instances of a data type from protobuf objects.
 -package struct ProtobufDecoder {
--    package enum DecodingError: Error {
 +public struct ProtobufDecoder {
+     /// An error that can occur during `ProtobufDecoder` decoding.
+-    package enum DecodingError: Error {
 +    public enum DecodingError: Error {
          case failed
      }
      
+     /// A type representing a field in a protobuf encoding.
 -    package typealias Field = ProtobufFormat.Field
--    package typealias WireType = ProtobufFormat.WireType
 +    public typealias Field = ProtobufFormat.Field
+     
+     /// A type representing the wire type of a protobuf encoding.
+-    package typealias WireType = ProtobufFormat.WireType
 +    public typealias WireType = ProtobufFormat.WireType
      
+     /// The data being decoded.
      var data: NSData
-     var ptr: UnsafeRawPointer
-@@ -22,9 +18,9 @@ package struct ProtobufDecoder {
-     var packedField: Field = Field(rawValue: 0)
-     var packedEnd: UnsafeRawPointer
+@@ -40,10 +36,10 @@ package struct ProtobufDecoder {
      var stack: [UnsafeRawPointer] = []
+     
+     /// User-defined information.
 -    package var userInfo: [CodingUserInfoKey : Any] = [:]
 +    public var userInfo: [CodingUserInfoKey : Any] = [:]
      
+     /// Creates an instance with a data buffer.
 -    package init(_ data: Data) {
 +    public init(_ data: Data) {
          let nsData = data as NSData
          self.data = nsData
          let ptr = nsData.bytes
-@@ -35,7 +31,7 @@ package struct ProtobufDecoder {
- }
+@@ -55,7 +51,7 @@ package struct ProtobufDecoder {
  
  extension ProtobufDecoder {
+     /// Decodes the next field in the data.
 -    package mutating func nextField() throws -> ProtobufDecoder.Field? {
 +    public mutating func nextField() throws -> ProtobufDecoder.Field? {
          guard ptr < end else {
              packedField = Field(rawValue: 0)
              return nil
-@@ -55,7 +51,7 @@ extension ProtobufDecoder {
-         return field
+@@ -76,7 +72,7 @@ extension ProtobufDecoder {
      }
      
+     /// Skips the next field in the data.
 -    package mutating func skipField(_ field: ProtobufDecoder.Field) throws {
 +    public mutating func skipField(_ field: ProtobufDecoder.Field) throws {
          switch field.wireType {
          case .varint:
              _ = try decodeVariant()
-@@ -78,7 +74,7 @@ extension ProtobufDecoder {
-         }
-     }
-     
+@@ -103,7 +99,7 @@ extension ProtobufDecoder {
+     ///
+     /// - Parameter field: The field to decode.
+     /// - Returns: A boolean(Bool) value.
 -    package mutating func boolField(_ field: ProtobufDecoder.Field) throws -> Bool {
 +    public mutating func boolField(_ field: ProtobufDecoder.Field) throws -> Bool {
          switch field.wireType {
          case .varint:
              break
-@@ -96,7 +92,7 @@ extension ProtobufDecoder {
-         return try decodeVariant() != 0
-     }
-     
+@@ -125,7 +121,7 @@ extension ProtobufDecoder {
+     ///
+     /// - Parameter field: The field to decode.
+     /// - Returns: An unsigned integer(UInt) value.
 -    package mutating func uintField(_ field: ProtobufDecoder.Field) throws -> UInt {
 +    public mutating func uintField(_ field: ProtobufDecoder.Field) throws -> UInt {
          switch field.wireType {
          case .varint:
              break
-@@ -114,32 +110,32 @@ extension ProtobufDecoder {
-         return try decodeVariant()
-     }
-     
+@@ -147,7 +143,7 @@ extension ProtobufDecoder {
+     ///
+     /// - Parameter field: The field to decode.
+     /// - Returns: A ProtobufEnum value.
 -    package mutating func enumField<T>(_ field: ProtobufDecoder.Field) throws -> T? where T: ProtobufEnum {
 +    public mutating func enumField<T>(_ field: ProtobufDecoder.Field) throws -> T? where T: ProtobufEnum {
          try T(protobufValue: uintField(field))
      }
      
+@@ -155,7 +151,7 @@ extension ProtobufDecoder {
+     ///
+     /// - Parameter field: The field to decode.
+     /// - Returns: An unsigned 8-bit integer(UInt8) value.
 -    package mutating func uint8Field(_ field: ProtobufDecoder.Field) throws -> UInt8 {
 +    public mutating func uint8Field(_ field: ProtobufDecoder.Field) throws -> UInt8 {
          try UInt8(uintField(field))
      }
      
+@@ -163,7 +159,7 @@ extension ProtobufDecoder {
+     ///
+     /// - Parameter field: The field to decode.
+     /// - Returns: An unsigned 16-bit integer(UInt16) value.
 -    package mutating func uint16Field(_ field: ProtobufDecoder.Field) throws -> UInt16 {
 +    public mutating func uint16Field(_ field: ProtobufDecoder.Field) throws -> UInt16 {
          try UInt16(uintField(field))
      }
      
+@@ -171,7 +167,7 @@ extension ProtobufDecoder {
+     ///
+     /// - Parameter field: The field to decode.
+     /// - Returns: An unsigned 32-bit integer(UInt32) value.
 -    package mutating func uint32Field(_ field: ProtobufDecoder.Field) throws -> UInt32 {
 +    public mutating func uint32Field(_ field: ProtobufDecoder.Field) throws -> UInt32 {
          try UInt32(uintField(field))
      }
      
+@@ -179,7 +175,7 @@ extension ProtobufDecoder {
+     ///
+     /// - Parameter field: The field to decode.
+     /// - Returns: An unsigned 64-bit integer(UInt64) value.
 -    package mutating func uint64Field(_ field: ProtobufDecoder.Field) throws -> UInt64 {
 +    public mutating func uint64Field(_ field: ProtobufDecoder.Field) throws -> UInt64 {
          try UInt64(uintField(field))
      }
      
+@@ -187,7 +183,7 @@ extension ProtobufDecoder {
+     ///
+     /// - Parameter field: The field to decode.
+     /// - Returns: A signed integer(Int) value.
 -    package mutating func intField(_ field: ProtobufDecoder.Field) throws -> Int {
 +    public mutating func intField(_ field: ProtobufDecoder.Field) throws -> Int {
          let value = Int(bitPattern: try uintField(field))
          return Int(bitPattern: UInt(bitPattern: (value >> 1)) ^ UInt(bitPattern: -(value & 1)))
      }
-     
+@@ -196,7 +192,7 @@ extension ProtobufDecoder {
+     ///
+     /// - Parameter field: The field to decode.
+     /// - Returns: A fixed 32-bit integer(UInt32) value.
 -    package mutating func fixed32Field(_ field: ProtobufDecoder.Field) throws -> UInt32 {
 +    public mutating func fixed32Field(_ field: ProtobufDecoder.Field) throws -> UInt32 {
          switch field.wireType {
          case .lengthDelimited:
              let offset = try decodeVariant()
-@@ -163,7 +159,7 @@ extension ProtobufDecoder {
-         return value
-     }
-     
+@@ -224,7 +220,7 @@ extension ProtobufDecoder {
+     ///
+     /// - Parameter field: The field to decode.
+     /// - Returns: A fixed 64-bit integer(UInt64) value.
 -    package mutating func fixed64Field(_ field: ProtobufDecoder.Field) throws -> UInt64 {
 +    public mutating func fixed64Field(_ field: ProtobufDecoder.Field) throws -> UInt64 {
          switch field.wireType {
          case .lengthDelimited:
              let offset = try decodeVariant()
-@@ -187,7 +183,7 @@ extension ProtobufDecoder {
-         return value
-     }
-     
+@@ -252,7 +248,7 @@ extension ProtobufDecoder {
+     ///
+     /// - Parameter field: The field to decode.
+     /// - Returns: A float(Float) value.
 -    package mutating func floatField(_ field: ProtobufDecoder.Field) throws -> Float {
 +    public mutating func floatField(_ field: ProtobufDecoder.Field) throws -> Float {
          switch field.wireType {
          case .lengthDelimited:
              let offset = try decodeVariant()
-@@ -211,7 +207,7 @@ extension ProtobufDecoder {
-         return Float(bitPattern: value)
-     }
-     
+@@ -280,7 +276,7 @@ extension ProtobufDecoder {
+     ///
+     /// - Parameter field: The field to decode.
+     /// - Returns: A double(Double) value.
 -    package mutating func doubleField(_ field: ProtobufDecoder.Field) throws -> Double {
 +    public mutating func doubleField(_ field: ProtobufDecoder.Field) throws -> Double {
          switch field.wireType {
          case .fixed64:
              break
-@@ -244,11 +240,11 @@ extension ProtobufDecoder {
-     }
-     
+@@ -317,7 +313,7 @@ extension ProtobufDecoder {
+     /// - Parameter field: The field to decode.
+     /// - Returns: A CGFloat value.
      @inline(__always)
 -    package mutating func cgFloatField(_ field: ProtobufDecoder.Field) throws -> CGFloat {
 +    public mutating func cgFloatField(_ field: ProtobufDecoder.Field) throws -> CGFloat {
          try doubleField(field)
      }
      
+@@ -325,7 +321,7 @@ extension ProtobufDecoder {
+     ///
+     /// - Parameter field: The field to decode.
+     /// - Returns: A data buffer value.
 -    package mutating func dataBufferField(_ field: ProtobufDecoder.Field) throws -> UnsafeRawBufferPointer {
 +    public mutating func dataBufferField(_ field: ProtobufDecoder.Field) throws -> UnsafeRawBufferPointer {
          switch field.wireType {
          case .lengthDelimited:
              try decodeDataBuffer()
-@@ -257,7 +253,7 @@ extension ProtobufDecoder {
-         }
-     }
-     
+@@ -338,7 +334,7 @@ extension ProtobufDecoder {
+     ///
+     /// - Parameter field: The field to decode.
+     /// - Returns: A data value.
 -    package mutating func dataField(_ field: ProtobufDecoder.Field) throws -> Data {
 +    public mutating func dataField(_ field: ProtobufDecoder.Field) throws -> Data {
          switch field.wireType {
          case .lengthDelimited:
              let buffer = try decodeDataBuffer()
-@@ -272,21 +268,21 @@ extension ProtobufDecoder {
-         }
-     }
-     
+@@ -357,7 +353,7 @@ extension ProtobufDecoder {
+     ///
+     /// - Parameter field: The field to decode.
+     /// - Returns: A ProtobufDecodableMessage value.
 -    package mutating func messageField<T>(_ field: ProtobufDecoder.Field) throws -> T where T: ProtobufDecodableMessage {
 +    public mutating func messageField<T>(_ field: ProtobufDecoder.Field) throws -> T where T: ProtobufDecodableMessage {
          guard field.wireType == .lengthDelimited else {
              throw DecodingError.failed
          }
-         return try decodeMessage()
-     }
-     
+@@ -370,7 +366,7 @@ extension ProtobufDecoder {
+     ///   - field: The field to decode.
+     ///   - body: A closure that decodes the message.
+     /// - Returns: A value decoded from the message.
 -    package mutating func messageField<T>(_ field: ProtobufDecoder.Field, _ body: (inout ProtobufDecoder) throws -> T) throws -> T {
 +    public mutating func messageField<T>(_ field: ProtobufDecoder.Field, _ body: (inout ProtobufDecoder) throws -> T) throws -> T {
          guard field.wireType == .lengthDelimited else {
              throw DecodingError.failed
          }
-         return try decodeMessage(body)
-     }
-     
+@@ -381,7 +377,7 @@ extension ProtobufDecoder {
+     ///
+     /// - Parameter field: The field to decode.
+     /// - Returns: A string value.
 -    package mutating func stringField(_ field: ProtobufDecoder.Field) throws -> String {
 +    public mutating func stringField(_ field: ProtobufDecoder.Field) throws -> String {
          let data = try dataField(field)
          guard let result = String(data: data, encoding: .utf8) else {
              throw DecodingError.failed
-@@ -294,7 +290,7 @@ extension ProtobufDecoder {
-         return result
-     }
-     
+@@ -393,7 +389,7 @@ extension ProtobufDecoder {
+     ///
+     /// - Parameter field: The field to decode.
+     /// - Returns: A codable value.
 -    package mutating func codableField<T>(_ field: ProtobufDecoder.Field) throws -> T where T: Decodable {
 +    public mutating func codableField<T>(_ field: ProtobufDecoder.Field) throws -> T where T: Decodable {
          let data = try dataField(field)
          return try value(fromBinaryPlist: data)
      }
 diff --git a/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufEncoder.swift b/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufEncoder.swift
-index bf9432b..528c5c3 100644
+index 20c38d1..6bf0291 100644
 --- a/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufEncoder.swift
 +++ b/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufEncoder.swift
 @@ -1,25 +1,21 @@
@@ -227,416 +262,543 @@ index bf9432b..528c5c3 100644
  
  import Foundation
  
+ /// An object that encodes instances of a data type as protobuf objects.
 -package struct ProtobufEncoder {
--    package enum EncodingError: Error {
 +public struct ProtobufEncoder {
+     /// An error that can occur during `ProtobufEncoder` encoding.
+-    package enum EncodingError: Error {
 +    public enum EncodingError: Error {
          case failed
      }
+     
+     /// A type representing a field in a protobuf encoding.
 -    package typealias Field = ProtobufFormat.Field
--    package typealias WireType = ProtobufFormat.WireType
 +    public typealias Field = ProtobufFormat.Field
+     
+     /// A type representing the wire type of a protobuf encoding.
+-    package typealias WireType = ProtobufFormat.WireType
 +    public typealias WireType = ProtobufFormat.WireType
      
+     /// The buffer being encoded.
      var buffer: UnsafeMutableRawPointer!
-     var size: Int = 0
-     var capacity: Int = 0
+@@ -34,7 +30,7 @@ package struct ProtobufEncoder {
      var stack: [Int] = []
+     
+     /// User-defined information.
 -    package var userInfo: [CodingUserInfoKey: Any] = [:]
 +    public var userInfo: [CodingUserInfoKey: Any] = [:]
      
-     private func takeData() -> Data {
-         if let buffer {
-@@ -29,14 +25,14 @@ package struct ProtobufEncoder {
-         }
-     }
-     
+     /// Takes the encoded data.
+     ///
+@@ -52,7 +48,7 @@ package struct ProtobufEncoder {
+     /// - Parameters:
+     ///   - body: A closure that encodes the value.
+     /// - Returns: The encoded data.
 -    package static func encoding(_ body: (inout ProtobufEncoder) throws -> Void) rethrows -> Data {
 +    public static func encoding(_ body: (inout ProtobufEncoder) throws -> Void) rethrows -> Data {
          var encoder = ProtobufEncoder()
          try body(&encoder)
          defer { free(encoder.buffer) }
-         return encoder.takeData()
-     }
-     
+@@ -64,7 +60,7 @@ package struct ProtobufEncoder {
+     /// - Parameters:
+     ///   - value: The value to encode.
+     /// - Returns: The encoded data.
 -    package static func encoding<T>(_ value: T) throws -> Data where T: ProtobufEncodableMessage {
 +    public static func encoding<T>(_ value: T) throws -> Data where T: ProtobufEncodableMessage {
          try encoding { encoder in
              try value.encode(to: &encoder)
          }
-@@ -104,7 +100,7 @@ package struct ProtobufEncoder {
- 
- extension ProtobufEncoder {
+@@ -143,7 +139,7 @@ extension ProtobufEncoder {
+     ///   - value: The value to encode.
+     ///   - defaultValue: The default value of the field.
      @inline(__always)
 -    package mutating func boolField(_ tag: UInt, _ value: Bool, defaultValue: Bool? = false) {
 +    public mutating func boolField(_ tag: UInt, _ value: Bool, defaultValue: Bool? = false) {
          guard value != defaultValue else { return }
          let field = Field(tag, wireType: .varint)
          encodeVarint(field.rawValue)
-@@ -112,7 +108,7 @@ extension ProtobufEncoder {
-     }
-     
+@@ -157,7 +153,7 @@ extension ProtobufEncoder {
+     ///   - value: The value to encode.
+     ///   - defaultValue: The default value of the field.
      @inline(__always)
 -    package mutating func uintField(_ tag: UInt, _ value: UInt, defaultValue: UInt? = 0) {
 +    public mutating func uintField(_ tag: UInt, _ value: UInt, defaultValue: UInt? = 0) {
          guard value != defaultValue else { return }
          let field = Field(tag, wireType: .varint)
          encodeVarint(field.rawValue)
-@@ -120,20 +116,20 @@ extension ProtobufEncoder {
-     }
- 
+@@ -171,7 +167,7 @@ extension ProtobufEncoder {
+     ///   - value: The value to encode.
+     ///   - defaultValue: The default value of the field.
      @inline(__always)
 -    package mutating func enumField<T>(_ tag: UInt, _ value: T, defaultValue: T?) where T: Equatable, T: ProtobufEnum {
 +    public mutating func enumField<T>(_ tag: UInt, _ value: T, defaultValue: T?) where T: Equatable, T: ProtobufEnum {
          guard value != defaultValue else { return }
          enumField(tag, value)
      }
-     
+@@ -182,7 +178,7 @@ extension ProtobufEncoder {
+     ///   - tag: The tag of the field.
+     ///   - value: The value to encode.
      @inline(__always)
 -    package mutating func enumField<T>(_ tag: UInt, _ value: T) where T: ProtobufEnum {
 +    public mutating func enumField<T>(_ tag: UInt, _ value: T) where T: ProtobufEnum {
          let field = Field(tag, wireType: .varint)
          encodeVarint(field.rawValue)
          encodeVarint(value.protobufValue)
-     }
-     
+@@ -195,7 +191,7 @@ extension ProtobufEncoder {
+     ///   - value: The value to encode.
+     ///   - defaultValue: The default value of the field.
      @inline(__always)
 -    package mutating func uint64Field(_ tag: UInt, _ value: UInt64, defaultValue: UInt64? = 0) {
 +    public mutating func uint64Field(_ tag: UInt, _ value: UInt64, defaultValue: UInt64? = 0) {
          guard value != defaultValue else { return }
          let field = Field(tag, wireType: .varint)
          encodeVarint(field.rawValue)
-@@ -141,7 +137,7 @@ extension ProtobufEncoder {
-     }
-     
+@@ -209,7 +205,7 @@ extension ProtobufEncoder {
+     ///   - value: The value to encode.
+     ///   - defaultValue: The default value of the field.
      @inline(__always)
 -    package mutating func intField(_ tag: UInt, _ value: Int, defaultValue: Int? = 0) {
 +    public mutating func intField(_ tag: UInt, _ value: Int, defaultValue: Int? = 0) {
          guard value != defaultValue else { return }
          let field = Field(tag, wireType: .varint)
          encodeVarint(field.rawValue)
-@@ -149,7 +145,7 @@ extension ProtobufEncoder {
-     }
-     
+@@ -223,7 +219,7 @@ extension ProtobufEncoder {
+     ///   - value: The value to encode.
+     ///   - defaultValue: The default value of the field.
      @inline(__always)
 -    package mutating func int64Field(_ tag: UInt, _ value: Int64, defaultValue: Int64? = 0) {
 +    public mutating func int64Field(_ tag: UInt, _ value: Int64, defaultValue: Int64? = 0) {
          guard value != defaultValue else { return }
          let field = Field(tag, wireType: .varint)
          encodeVarint(field.rawValue)
-@@ -157,7 +153,7 @@ extension ProtobufEncoder {
-     }
-     
+@@ -237,7 +233,7 @@ extension ProtobufEncoder {
+     ///   - value: The value to encode.
+     ///   - defaultValue: The default value of the field.
      @inline(__always)
 -    package mutating func fixed32Field(_ tag: UInt, _ value: UInt32, defaultValue: UInt32? = 0) {
 +    public mutating func fixed32Field(_ tag: UInt, _ value: UInt32, defaultValue: UInt32? = 0) {
          guard value != defaultValue else { return }
          let field = Field(tag, wireType: .fixed32)
          encodeVarint(field.rawValue)
-@@ -165,7 +161,7 @@ extension ProtobufEncoder {
-     }
-     
+@@ -251,7 +247,7 @@ extension ProtobufEncoder {
+     ///   - value: The value to encode.
+     ///   - defaultValue: The default value of the field.
      @inline(__always)
 -    package mutating func fixed64Field(_ tag: UInt, _ value: UInt64, defaultValue: UInt64? = 0) {
 +    public mutating func fixed64Field(_ tag: UInt, _ value: UInt64, defaultValue: UInt64? = 0) {
          guard value != defaultValue else { return }
          let field = Field(tag, wireType: .fixed64)
          encodeVarint(field.rawValue)
-@@ -173,7 +169,7 @@ extension ProtobufEncoder {
-     }
-     
+@@ -265,7 +261,7 @@ extension ProtobufEncoder {
+     ///   - value: The value to encode.
+     ///   - defaultValue: The default value of the field.
      @inline(__always)
 -    package mutating func floatField(_ tag: UInt, _ value: Float, defaultValue: Float? = 0) {
 +    public mutating func floatField(_ tag: UInt, _ value: Float, defaultValue: Float? = 0) {
          guard value != defaultValue else { return }
          let field = Field(tag, wireType: .fixed32)
          encodeVarint(field.rawValue)
-@@ -181,7 +177,7 @@ extension ProtobufEncoder {
-     }
-     
+@@ -279,7 +275,7 @@ extension ProtobufEncoder {
+     ///   - value: The value to encode.
+     ///   - defaultValue: The default value of the field.
      @inline(__always)
 -    package mutating func doubleField(_ tag: UInt, _ value: Double, defaultValue: Double? = 0) {
 +    public mutating func doubleField(_ tag: UInt, _ value: Double, defaultValue: Double? = 0) {
          guard value != defaultValue else { return }
          let field = Field(tag, wireType: .fixed64)
          encodeVarint(field.rawValue)
-@@ -189,7 +185,7 @@ extension ProtobufEncoder {
-     }
-     
+@@ -293,7 +289,7 @@ extension ProtobufEncoder {
+     ///   - value: The value to encode.
+     ///   - defaultValue: The default value of the field.
      @inline(__always)
 -    package mutating func cgFloatField(_ tag: UInt, _ value: CGFloat, defaultValue: CGFloat? = 0) {
 +    public mutating func cgFloatField(_ tag: UInt, _ value: CGFloat, defaultValue: CGFloat? = 0) {
          guard value != defaultValue else { return }
          let field = Field(tag, wireType: value < 65536.0 ? .fixed32 : .fixed64)
          encodeVarint(field.rawValue)
-@@ -200,13 +196,13 @@ extension ProtobufEncoder {
-         }
-     }
-     
+@@ -309,7 +305,7 @@ extension ProtobufEncoder {
+     /// - Parameters:
+     ///   - tag: The tag of the field.
+     ///   - value: The value to encode.
 -    package mutating func dataField(_ tag: UInt, _ value: Data) {
 +    public mutating func dataField(_ tag: UInt, _ value: Data) {
          value.withUnsafeBytes { buffer in
              dataField(tag, buffer)
          }
-     }
-     
+@@ -320,7 +316,7 @@ extension ProtobufEncoder {
+     /// - Parameters:
+     ///   - tag: The tag of the field.
+     ///   - value: The value to encode.
 -    package mutating func dataField(_ tag: UInt, _ value: UnsafeRawBufferPointer) {
 +    public mutating func dataField(_ tag: UInt, _ value: UnsafeRawBufferPointer) {
          guard !value.isEmpty else {
              return
          }
-@@ -216,7 +212,7 @@ extension ProtobufEncoder {
-     }
-     
+@@ -335,7 +331,7 @@ extension ProtobufEncoder {
+     ///   - tag: The tag of the field.
+     ///   - body: A closure that encodes the value.
      @inline(__always)
 -    package mutating func packedField(_ tag: UInt, _ body: (inout ProtobufEncoder) -> Void) {
 +    public mutating func packedField(_ tag: UInt, _ body: (inout ProtobufEncoder) -> Void) {
          let field = Field(tag, wireType: .lengthDelimited)
          encodeVarint(field.rawValue)
          stack.append(size)
-@@ -226,7 +222,7 @@ extension ProtobufEncoder {
-     }
-     
+@@ -350,7 +346,7 @@ extension ProtobufEncoder {
+     ///   - tag: The tag of the field.
+     ///   - body: A closure that encodes the value.
      @inline(__always)
 -    package mutating func messageField(_ tag: UInt, _ body: (inout ProtobufEncoder) throws -> Void) rethrows {
 +    public mutating func messageField(_ tag: UInt, _ body: (inout ProtobufEncoder) throws -> Void) rethrows {
          let field = Field(tag, wireType: .lengthDelimited)
          encodeVarint(field.rawValue)
          stack.append(size)
-@@ -236,12 +232,12 @@ extension ProtobufEncoder {
-     }
-     
+@@ -366,7 +362,7 @@ extension ProtobufEncoder {
+     ///   - value: The value to encode.
+     ///   - defaultValue: The default value of the field.
      @inline(__always)
 -    package mutating func messageField<T>(_ tag: UInt, _ value: T, defaultValue: T) throws where T: Equatable, T: ProtobufEncodableMessage {
 +    public mutating func messageField<T>(_ tag: UInt, _ value: T, defaultValue: T) throws where T: Equatable, T: ProtobufEncodableMessage {
          guard value != defaultValue else { return }
          try messageField(tag, value)
      }
-     
+@@ -376,7 +372,7 @@ extension ProtobufEncoder {
+     /// - Parameters:
+     ///   - tag: The tag of the field.
+     ///   - value: The value to encode.
 -    package mutating func messageField<T>(_ tag: UInt, _ value: T) throws where T: ProtobufEncodableMessage {
 +    public mutating func messageField<T>(_ tag: UInt, _ value: T) throws where T: ProtobufEncodableMessage {
          let field = Field(tag, wireType: .lengthDelimited)
          encodeVarint(field.rawValue)
          try encodeMessage(value)
-@@ -255,7 +251,7 @@ extension ProtobufEncoder {
-     }
-     
+@@ -401,7 +397,7 @@ extension ProtobufEncoder {
+     ///   - value: The value to encode.
+     ///   - defaultValue: The default value of the field.
      @inline(__always)
 -    package mutating func stringField(_ tag: UInt, _ value: String, defaultValue: String? = "") throws {
 +    public mutating func stringField(_ tag: UInt, _ value: String, defaultValue: String? = "") throws {
          guard value != defaultValue else { return }
          try stringFieldAlways(tag, value)
      }
-@@ -272,12 +268,12 @@ extension ProtobufEncoder {
-     }
-     
+@@ -431,7 +427,7 @@ extension ProtobufEncoder {
+     ///   - value: The value to encode.
+     ///   - defaultValue: The default value of the field.
      @inline(__always)
 -    package mutating func codableField<T>(_ tag: UInt, _ value: T, defaultValue: T) throws where T: Encodable, T: Equatable {
 +    public mutating func codableField<T>(_ tag: UInt, _ value: T, defaultValue: T) throws where T: Encodable, T: Equatable {
          guard value != defaultValue else { return }
          try codableField(tag, value)
      }
-     
+@@ -441,7 +437,7 @@ extension ProtobufEncoder {
+     /// - Parameters:
+     ///   - tag: The tag of the field.
+     ///   - value: The value to encode.
 -    package mutating func codableField<T>(_ tag: UInt, _ value: T) throws where T: Encodable {
 +    public mutating func codableField<T>(_ tag: UInt, _ value: T) throws where T: Encodable {
          let field = Field(tag, wireType: .lengthDelimited)
          encodeVarint(field.rawValue)
          let data = try binaryPlistData(for: value)
-@@ -286,7 +282,7 @@ extension ProtobufEncoder {
-         }
-     }
-     
+@@ -454,7 +450,7 @@ extension ProtobufEncoder {
+     ///
+     /// - Parameters:
+     ///   - tag: The tag of the field.
 -    package mutating func emptyField(_ tag: UInt) {
 +    public mutating func emptyField(_ tag: UInt) {
          let field = Field(tag, wireType: .lengthDelimited)
          encodeVarint(field.rawValue)
          stack.append(size)
-@@ -298,113 +294,113 @@ extension ProtobufEncoder {
- 
- extension ProtobufEncoder {
+@@ -472,7 +468,7 @@ extension ProtobufEncoder {
+     ///   - value: The value to encode.
+     ///   - defaultValue: The default value of the field.
      @inline(__always)
 -    package mutating func boolField<T>(_ tag: T, _ value: Bool, defaultValue: Bool? = false) where T: ProtobufTag {
 +    public mutating func boolField<T>(_ tag: T, _ value: Bool, defaultValue: Bool? = false) where T: ProtobufTag {
          boolField(tag.rawValue, value, defaultValue: defaultValue)
      }
      
+@@ -483,7 +479,7 @@ extension ProtobufEncoder {
+     ///   - value: The value to encode.
+     ///   - defaultValue: The default value of the field.
      @inline(__always)
 -    package mutating func uintField<T>(_ tag: T, _ value: UInt, defaultValue: UInt? = 0) where T: ProtobufTag {
 +    public mutating func uintField<T>(_ tag: T, _ value: UInt, defaultValue: UInt? = 0) where T: ProtobufTag {
          uintField(tag.rawValue, value, defaultValue: defaultValue)
      }
      
+@@ -494,7 +490,7 @@ extension ProtobufEncoder {
+     ///   - value: The value to encode.
+     ///   - defaultValue: The default value of the field.
      @inline(__always)
 -    package mutating func enumField<T, U>(_ tag: T, _ value: U, defaultValue: U?) where T: ProtobufTag, U: Equatable, U: ProtobufEnum {
 +    public mutating func enumField<T, U>(_ tag: T, _ value: U, defaultValue: U?) where T: ProtobufTag, U: Equatable, U: ProtobufEnum {
          enumField(tag.rawValue, value, defaultValue: defaultValue)
      }
      
+@@ -504,7 +500,7 @@ extension ProtobufEncoder {
+     ///   - tag: The tag of the field.
+     ///   - value: The value to encode.
      @inline(__always)
 -    package mutating func enumField<T, U>(_ tag: T, _ value: U) where T: ProtobufTag, U: ProtobufEnum {
 +    public mutating func enumField<T, U>(_ tag: T, _ value: U) where T: ProtobufTag, U: ProtobufEnum {
          enumField(tag.rawValue, value)
      }
      
+@@ -515,7 +511,7 @@ extension ProtobufEncoder {
+     ///   - value: The value to encode.
+     ///   - defaultValue: The default value of the field.
      @inline(__always)
 -    package mutating func uint64Field<T>(_ tag: T, _ value: UInt64, defaultValue: UInt64? = 0) where T: ProtobufTag {
 +    public mutating func uint64Field<T>(_ tag: T, _ value: UInt64, defaultValue: UInt64? = 0) where T: ProtobufTag {
          uint64Field(tag.rawValue, value, defaultValue: defaultValue)
      }
      
+@@ -526,7 +522,7 @@ extension ProtobufEncoder {
+     ///   - value: The value to encode.
+     ///   - defaultValue: The default value of the field.
      @inline(__always)
 -    package mutating func intField<T>(_ tag: T, _ value: Int, defaultValue: Int? = 0) where T: ProtobufTag {
 +    public mutating func intField<T>(_ tag: T, _ value: Int, defaultValue: Int? = 0) where T: ProtobufTag {
          intField(tag.rawValue, value, defaultValue: defaultValue)
      }
      
+@@ -537,7 +533,7 @@ extension ProtobufEncoder {
+     ///   - value: The value to encode.
+     ///   - defaultValue: The default value of the field.
      @inline(__always)
 -    package mutating func int64Field<T>(_ tag: T, _ value: Int64, defaultValue: Int64? = 0) where T: ProtobufTag {
 +    public mutating func int64Field<T>(_ tag: T, _ value: Int64, defaultValue: Int64? = 0) where T: ProtobufTag {
          int64Field(tag.rawValue, value, defaultValue: defaultValue)
      }
      
+@@ -548,7 +544,7 @@ extension ProtobufEncoder {
+     ///   - value: The value to encode.
+     ///   - defaultValue: The default value of the field.
      @inline(__always)
 -    package mutating func fixed32Field<T>(_ tag: T, _ value: UInt32, defaultValue: UInt32? = 0) where T: ProtobufTag {
 +    public mutating func fixed32Field<T>(_ tag: T, _ value: UInt32, defaultValue: UInt32? = 0) where T: ProtobufTag {
          fixed32Field(tag.rawValue, value, defaultValue: defaultValue)
      }
      
+@@ -559,7 +555,7 @@ extension ProtobufEncoder {
+     ///   - value: The value to encode.
+     ///   - defaultValue: The default value of the field.
      @inline(__always)
 -    package mutating func fixed64Field<T>(_ tag: T, _ value: UInt64, defaultValue: UInt64? = 0) where T: ProtobufTag {
 +    public mutating func fixed64Field<T>(_ tag: T, _ value: UInt64, defaultValue: UInt64? = 0) where T: ProtobufTag {
          fixed64Field(tag.rawValue, value, defaultValue: defaultValue)
      }
      
+@@ -570,7 +566,7 @@ extension ProtobufEncoder {
+     ///   - value: The value to encode.
+     ///   - defaultValue: The default value of the field.
      @inline(__always)
 -    package mutating func floatField<T>(_ tag: T, _ value: Float, defaultValue: Float? = 0) where T: ProtobufTag {
 +    public mutating func floatField<T>(_ tag: T, _ value: Float, defaultValue: Float? = 0) where T: ProtobufTag {
          floatField(tag.rawValue, value, defaultValue: defaultValue)
      }
      
+@@ -581,7 +577,7 @@ extension ProtobufEncoder {
+     ///   - value: The value to encode.
+     ///   - defaultValue: The default value of the field.
      @inline(__always)
 -    package mutating func doubleField<T>(_ tag: T, _ value: Double, defaultValue: Double? = 0) where T: ProtobufTag {
 +    public mutating func doubleField<T>(_ tag: T, _ value: Double, defaultValue: Double? = 0) where T: ProtobufTag {
          doubleField(tag.rawValue, value, defaultValue: defaultValue)
      }
      
+@@ -592,7 +588,7 @@ extension ProtobufEncoder {
+     ///   - value: The value to encode.
+     ///   - defaultValue: The default value of the field.
      @inline(__always)
 -    package mutating func cgFloatField<T>(_ tag: T, _ value: CGFloat, defaultValue: CGFloat? = 0) where T: ProtobufTag {
 +    public mutating func cgFloatField<T>(_ tag: T, _ value: CGFloat, defaultValue: CGFloat? = 0) where T: ProtobufTag {
          cgFloatField(tag.rawValue, value, defaultValue: defaultValue)
      }
      
+@@ -602,7 +598,7 @@ extension ProtobufEncoder {
+     ///   - tag: The tag of the field.
+     ///   - value: The value to encode.
      @inline(__always)
 -    package mutating func dataField<T>(_ tag: T, _ value: Data) where T: ProtobufTag {
 +    public mutating func dataField<T>(_ tag: T, _ value: Data) where T: ProtobufTag {
          dataField(tag.rawValue, value)
      }
      
+@@ -612,7 +608,7 @@ extension ProtobufEncoder {
+     ///   - tag: The tag of the field.
+     ///   - value: The value to encode.
      @inline(__always)
 -    package mutating func dataField<T>(_ tag: T, _ value: UnsafeRawBufferPointer) where T: ProtobufTag {
 +    public mutating func dataField<T>(_ tag: T, _ value: UnsafeRawBufferPointer) where T: ProtobufTag {
          dataField(tag.rawValue, value)
      }
      
+@@ -622,7 +618,7 @@ extension ProtobufEncoder {
+     ///   - tag: The tag of the field.
+     ///   - body: A closure that encodes the value.
      @inline(__always)
 -    package mutating func packedField<T>(_ tag: T, _ body: (inout ProtobufEncoder) -> Void) where T: ProtobufTag {
 +    public mutating func packedField<T>(_ tag: T, _ body: (inout ProtobufEncoder) -> Void) where T: ProtobufTag {
          packedField(tag.rawValue, body)
      }
      
+@@ -632,7 +628,7 @@ extension ProtobufEncoder {
+     ///   - tag: The tag of the field.
+     ///   - body: A closure that encodes the value.
      @inline(__always)
 -    package mutating func messageField<T>(_ tag: T, _ body: (inout ProtobufEncoder) throws -> Void) rethrows where T: ProtobufTag {
 +    public mutating func messageField<T>(_ tag: T, _ body: (inout ProtobufEncoder) throws -> Void) rethrows where T: ProtobufTag {
          try messageField(tag.rawValue, body)
      }
      
+@@ -643,7 +639,7 @@ extension ProtobufEncoder {
+     ///   - value: The value to encode.
+     ///   - defaultValue: The default value of the field.
      @inline(__always)
 -    package mutating func messageField<T, U>(_ tag: T, _ value: U, defaultValue: U) throws where T: ProtobufTag, U: Equatable, U: ProtobufEncodableMessage {
 +    public mutating func messageField<T, U>(_ tag: T, _ value: U, defaultValue: U) throws where T: ProtobufTag, U: Equatable, U: ProtobufEncodableMessage {
          try messageField(tag.rawValue, value, defaultValue: defaultValue)
      }
      
+@@ -653,7 +649,7 @@ extension ProtobufEncoder {
+     ///   - tag: The tag of the field.
+     ///   - value: The value to encode.
      @inline(__always)
 -    package mutating func messageField<T>(_ tag: T, _ value: ProtobufEncodableMessage) throws where T: ProtobufTag {
 +    public mutating func messageField<T>(_ tag: T, _ value: ProtobufEncodableMessage) throws where T: ProtobufTag {
          try messageField(tag.rawValue, value)
      }
      
+@@ -664,7 +660,7 @@ extension ProtobufEncoder {
+     ///   - value: The value to encode.
+     ///   - defaultValue: The default value of the field.
      @inline(__always)
 -    package mutating func stringField<T>(_ tag: T, _ value: String, defaultValue: String? = "") throws where T: ProtobufTag {
 +    public mutating func stringField<T>(_ tag: T, _ value: String, defaultValue: String? = "") throws where T: ProtobufTag {
          try stringField(tag.rawValue, value, defaultValue: defaultValue)
      }
      
+@@ -675,7 +671,7 @@ extension ProtobufEncoder {
+     ///   - value: The value to encode.
+     ///   - defaultValue: The default value of the field.
      @inline(__always)
 -    package mutating func codableField<T>(_ tag: T, _ value: T, defaultValue: T) throws where T: ProtobufTag, T: Encodable, T: Equatable {
 +    public mutating func codableField<T>(_ tag: T, _ value: T, defaultValue: T) throws where T: ProtobufTag, T: Encodable, T: Equatable {
          try codableField(tag.rawValue, value, defaultValue: defaultValue)
      }
      
+@@ -685,7 +681,7 @@ extension ProtobufEncoder {
+     ///   - tag: The tag of the field.
+     ///   - value: The value to encode.
      @inline(__always)
 -    package mutating func codableField<T>(_ tag: T, _ value: T) throws where T: ProtobufTag, T: Encodable {
 +    public mutating func codableField<T>(_ tag: T, _ value: T) throws where T: ProtobufTag, T: Encodable {
          try codableField(tag.rawValue, value)
      }
  }
- 
- extension ProtobufEncoder {
+@@ -695,7 +691,7 @@ extension ProtobufEncoder {
+     ///
+     /// - Parameters:
+     ///   - value: The value to encode.
 -    package mutating func encodeVarint(_ value: UInt) {
 +    public mutating func encodeVarint(_ value: UInt) {
          let highBit = 64 - (value | 1).leadingZeroBitCount
          let count = (highBit + 6) / 7
          let oldSize = size
-@@ -427,17 +423,17 @@ extension ProtobufEncoder {
-         pointer.storeBytes(of: UInt8(currentValue), as: UInt8.self)
+@@ -719,7 +715,7 @@ extension ProtobufEncoder {
      }
      
+     /// Encodes a varint.
 -    package mutating func encodeVarint64(_ value: UInt64) {
 +    public mutating func encodeVarint64(_ value: UInt64) {
          encodeVarint(UInt(value))
      }
      
-     // (n << 1) ^ (n >> 63)
-     // See https://protobuf.dev/programming-guides/encoding/#signed-ints
+@@ -729,7 +725,7 @@ extension ProtobufEncoder {
+     ///
+     /// - Parameters:
+     ///   - value: The value to encode.
 -    package mutating func encodeVarintZZ(_ value: Int) {
 +    public mutating func encodeVarintZZ(_ value: Int) {
          encodeVarint(UInt(bitPattern: (value << 1) ^ (value >> 63)))
      }
      
+@@ -737,7 +733,7 @@ extension ProtobufEncoder {
+     ///
+     /// - Parameters:
+     ///   - value: The value to encode.
 -    package mutating func encodeVarint64ZZ(_ value: Int64) {
 +    public mutating func encodeVarint64ZZ(_ value: Int64) {
          encodeVarintZZ(Int(value))
      }
      
-@@ -467,19 +463,19 @@ extension ProtobufEncoder {
-     }
-     #endif
-     
+@@ -779,7 +775,7 @@ extension ProtobufEncoder {
+     ///
+     /// - Parameters:
+     ///   - value: The value to encode.
 -    package mutating func encodeBool(_ value: Bool) {
 +    public mutating func encodeBool(_ value: Bool) {
          encodeBitwiseCopyable(value)
      }
      
+@@ -787,7 +783,7 @@ extension ProtobufEncoder {
+     ///
+     /// - Parameters:
+     ///   - value: The value to encode.
 -    package mutating func encodeFixed32(_ value: UInt32) {
 +    public mutating func encodeFixed32(_ value: UInt32) {
          encodeBitwiseCopyable(value)
      }
      
+@@ -795,7 +791,7 @@ extension ProtobufEncoder {
+     ///
+     /// - Parameters:
+     ///   - value: The value to encode.
 -    package mutating func encodeFixed64(_ value: UInt64) {
 +    public mutating func encodeFixed64(_ value: UInt64) {
          encodeBitwiseCopyable(value)
      }
      
+@@ -803,7 +799,7 @@ extension ProtobufEncoder {
+     ///
+     /// - Parameters:
+     ///   - value: The value to encode.
 -    package mutating func encodeFloat(_ value: Float) {
 +    public mutating func encodeFloat(_ value: Float) {
          encodeBitwiseCopyable(value)
      }
      
+@@ -811,7 +807,7 @@ extension ProtobufEncoder {
+     ///
+     /// - Parameters:
+     ///   - value: The value to encode.
+-    package mutating func encodeDouble(_ value: Double) {
++    public mutating func encodeDouble(_ value: Double) {
+         encodeBitwiseCopyable(value)
+     }
+     
+@@ -819,7 +815,7 @@ extension ProtobufEncoder {
+     ///
+     /// - Parameters:
+     ///   - dataBuffer: The data to encode.
+-    package mutating func encodeData(_ dataBuffer: UnsafeRawBufferPointer) {
++    public mutating func encodeData(_ dataBuffer: UnsafeRawBufferPointer) {
+         // Encode LEN
+         let dataBufferCount = dataBuffer.count
+         encodeVarint(UInt(bitPattern: dataBufferCount))
+@@ -844,7 +840,7 @@ extension ProtobufEncoder {
+     ///
+     /// - Parameters:
+     ///   - value: The value to encode.
+-    package mutating func encodeMessage<T>(_ value: T) throws where T: ProtobufEncodableMessage {
++    public mutating func encodeMessage<T>(_ value: T) throws where T: ProtobufEncodableMessage {
+         stack.append(size)
+         size += 1
+         try value.encode(to: &self)
 diff --git a/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufMessage.swift b/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufMessage.swift
-index 0bfd65a..a276d10 100644
+index 216500f..bcbf1d8 100644
 --- a/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufMessage.swift
 +++ b/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufMessage.swift
-@@ -1,84 +1,81 @@
+@@ -1,16 +1,13 @@
  //
  //  ProtobufMessage.swift
 -//  OpenSwiftUICore
@@ -649,141 +811,181 @@ index 0bfd65a..a276d10 100644
  
  // MARK: - ProtobufMessage
  
+ /// A type that can encode itself to a protobuf representation.
 -package protocol ProtobufEncodableMessage {
 +public protocol ProtobufEncodableMessage {
-     func encode(to encoder: inout ProtobufEncoder) throws
- }
--package protocol ProtobufDecodableMessage {
-+public protocol ProtobufDecodableMessage {
-     init(from decoder: inout ProtobufDecoder) throws
+     /// Encodes this value into the given encoder.
+     ///
+     /// If the value fails to encode anything, `encoder` will encode an empty
+@@ -24,7 +21,7 @@ package protocol ProtobufEncodableMessage {
  }
  
+ /// A  type that can decode itself from a protobuf representation.
+-package protocol ProtobufDecodableMessage {
++public protocol ProtobufDecodableMessage {
+     /// Creates a new instance by decoding from the given decoder.
+     ///
+     /// This initializer throws an error if reading from the decoder fails, or
+@@ -40,12 +37,12 @@ package protocol ProtobufDecodableMessage {
+ /// `ProtobufMessage` is a type alias for the `ProtobufEncodableMessage` and `ProtobufDecodableMessage` protocols.
+ /// When you use `ProtobufMessage` as a type or a generic constraint, it matches
+ /// any type that conforms to both protocols.
 -package typealias ProtobufMessage = ProtobufDecodableMessage & ProtobufEncodableMessage
 +public typealias ProtobufMessage = ProtobufDecodableMessage & ProtobufEncodableMessage
  
  // MARK: - ProtobufEnum
  
+ /// A type that can be represented as a protobuf enum.
 -package protocol ProtobufEnum {
 +public protocol ProtobufEnum {
+     /// The value of the enum as a protobuf enum.
      var protobufValue: UInt { get }
-     init?(protobufValue: UInt)
- }
+ 
+@@ -55,12 +52,12 @@ package protocol ProtobufEnum {
  
  extension ProtobufEnum where Self: RawRepresentable, RawValue: BinaryInteger {
+     /// The value of the enum as a protobuf enum.
 -    package var protobufValue: UInt {
 +    public var protobufValue: UInt {
          UInt(rawValue)
      }
      
+     /// Creates an instance from a protobuf enum value.
 -    package init?(protobufValue: UInt) {
 +    public init?(protobufValue: UInt) {
          self.init(rawValue: RawValue(protobufValue))
      }
  }
- 
- // MARK: - ProtobufTag
- 
+@@ -70,7 +67,7 @@ extension ProtobufEnum where Self: RawRepresentable, RawValue: BinaryInteger {
+ /// A protocol representing a tag in protobuf encoding.
+ ///
+ /// Conforms to `Equatable` to allow comparison of tags.
 -package protocol ProtobufTag: Equatable {
 +public protocol ProtobufTag: Equatable {
+     /// The raw value of the tag.
      var rawValue: UInt { get }
-     init(rawValue: UInt)
- }
  
+@@ -81,37 +78,37 @@ package protocol ProtobufTag: Equatable {
  // MARK: - ProtobufFormat
  
+ /// A type representing the format of a protobuf encoding.
 -package enum ProtobufFormat {
--    package struct WireType: Equatable {
--        package let rawValue: UInt
--        package init(rawValue: UInt) {
 +public enum ProtobufFormat {
+     /// A type representing the wire type of a protobuf encoding.
+-    package struct WireType: Equatable {
 +    public struct WireType: Equatable {
+         /// The raw value of the wire type.
+-        package let rawValue: UInt
 +        public let rawValue: UInt
+         
+         /// Creates an instance from a raw value.
+-        package init(rawValue: UInt) {
 +        public init(rawValue: UInt) {
              self.rawValue = rawValue
          }
          
+         /// A wire type representing a varint.
 -        package static var varint: ProtobufFormat.WireType { WireType(rawValue: 0) }
--        package static var fixed64: ProtobufFormat.WireType { WireType(rawValue: 1) }
--        package static var lengthDelimited: ProtobufFormat.WireType { WireType(rawValue: 2) }
--        package static var fixed32: ProtobufFormat.WireType { WireType(rawValue: 5) }
 +        public static var varint: ProtobufFormat.WireType { WireType(rawValue: 0) }
+         
+         /// A wire type representing a fixed 64-bit value.
+-        package static var fixed64: ProtobufFormat.WireType { WireType(rawValue: 1) }
 +        public static var fixed64: ProtobufFormat.WireType { WireType(rawValue: 1) }
+         
+         /// A wire type representing a length-delimited value.
+-        package static var lengthDelimited: ProtobufFormat.WireType { WireType(rawValue: 2) }
 +        public static var lengthDelimited: ProtobufFormat.WireType { WireType(rawValue: 2) }
+         
+         /// A wire type representing a fixed 32-bit value.
+-        package static var fixed32: ProtobufFormat.WireType { WireType(rawValue: 5) }
 +        public static var fixed32: ProtobufFormat.WireType { WireType(rawValue: 5) }
      }
-     
+ 
+     /// A type representing a field in a protobuf encoding.
 -    package struct Field: Equatable {
--        package var rawValue: UInt
--        package init(rawValue: UInt) {
 +    public struct Field: Equatable {
+         /// The raw value of the field.
+-        package var rawValue: UInt
 +        public var rawValue: UInt
+ 
+         /// Creates an instance from a raw value.
+-        package init(rawValue: UInt) {
 +        public init(rawValue: UInt) {
              self.rawValue = rawValue
          }
          
-         // field = (field_number << 3) | wire_type
+@@ -119,23 +116,23 @@ package enum ProtobufFormat {
          // See https://protobuf.dev/programming-guides/encoding/
+ 
+         /// Creates an instance from a tag and wire type.
 -        package init(_ tag: UInt, wireType: WireType) {
 +        public init(_ tag: UInt, wireType: WireType) {
              rawValue = (tag << 3) | wireType.rawValue
          }
          
+         /// The tag of the field.
 -        package var tag: UInt {
 +        public var tag: UInt {
              rawValue >> 3
          }
          
+         /// The wire type of the field.
 -        package var wireType: WireType {
 +        public var wireType: WireType {
              WireType(rawValue: rawValue & 7)
          }
          
+         /// Converts the tag to a specific type.
          @inline(__always)
 -        package func tag<T>(as: T.Type = T.self) -> T where T: ProtobufTag {
 +        public func tag<T>(as: T.Type = T.self) -> T where T: ProtobufTag {
              T(rawValue: tag)
          }
      }
-@@ -86,7 +83,7 @@ package enum ProtobufFormat {
- 
+@@ -144,7 +141,7 @@ package enum ProtobufFormat {
  // MARK: - CoddleByProtobuf
  
+ /// A type that can be encoded and decoded using protobuf.
 -package protocol CodaleByProtobuf: Codable, ProtobufMessage {}
 +public protocol CodaleByProtobuf: Codable, ProtobufMessage {}
  
  extension CodaleByProtobuf {
-     func encode(to encoder: any Encoder) throws {
-@@ -110,13 +107,13 @@ extension CodaleByProtobuf {
- // MARK: - ProtobufCodable
+     /// Encodes the value to a protobuf representation.
+@@ -171,17 +168,17 @@ extension CodaleByProtobuf {
  
+ /// A property wrapper that encodes and decodes a value using protobuf.
  @propertyWrapper
 -package struct ProtobufCodable<Value>: Codable where Value: ProtobufMessage {
--    package var wrappedValue: Value
--    package init(wrappedValue: Value) {
 +public struct ProtobufCodable<Value>: Codable where Value: ProtobufMessage {
+     /// The wrapped value.
+-    package var wrappedValue: Value
 +    public var wrappedValue: Value
+     
+     /// Creates an instance with a wrapped value.
+-    package init(wrappedValue: Value) {
 +    public init(wrappedValue: Value) {
          self.wrappedValue = wrappedValue
      }
  
+     /// Encodes the wrapped value to a protobuf representation.
 -    package func encode(to encoder: any Encoder) throws {
 +    public func encode(to encoder: any Encoder) throws {
          let data = try ProtobufEncoder.encoding { protobufEncoder in
              protobufEncoder.userInfo = encoder.userInfo
              try wrappedValue.encode(to: &protobufEncoder)
-@@ -125,7 +122,7 @@ package struct ProtobufCodable<Value>: Codable where Value: ProtobufMessage {
-         try container.encode(data)
+@@ -191,7 +188,7 @@ package struct ProtobufCodable<Value>: Codable where Value: ProtobufMessage {
      }
  
+     /// Creates an instance from a decoder.
 -    package init(from decoder: any Decoder) throws {
 +    public init(from decoder: any Decoder) throws {
          let container = try decoder.singleValueContainer()
          let data = try container.decode(Data.self)
          var protobufDecoder = ProtobufDecoder(data)
-@@ -135,7 +132,7 @@ package struct ProtobufCodable<Value>: Codable where Value: ProtobufMessage {
- }
+@@ -202,7 +199,7 @@ package struct ProtobufCodable<Value>: Codable where Value: ProtobufMessage {
  
  extension ProtobufCodable: Equatable where Value: Equatable {
+     /// Compares two instances of `ProtobufCodable`.
 -    package static func == (lhs: ProtobufCodable<Value>, rhs: ProtobufCodable<Value>) -> Bool {
 +    public static func == (lhs: ProtobufCodable<Value>, rhs: ProtobufCodable<Value>) -> Bool {
          lhs.wrappedValue == rhs.wrappedValue

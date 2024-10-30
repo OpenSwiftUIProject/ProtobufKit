@@ -4,22 +4,41 @@
 
 import Foundation
 
+/// An object that decodes instances of a data type from protobuf objects.
 public struct ProtobufDecoder {
+    /// An error that can occur during `ProtobufDecoder` decoding.
     public enum DecodingError: Error {
         case failed
     }
     
+    /// A type representing a field in a protobuf encoding.
     public typealias Field = ProtobufFormat.Field
+    
+    /// A type representing the wire type of a protobuf encoding.
     public typealias WireType = ProtobufFormat.WireType
     
+    /// The data being decoded.
     var data: NSData
+    
+    /// A pointer to the current position in the data.
     var ptr: UnsafeRawPointer
+    
+    /// A pointer to the end of the data.
     var end: UnsafeRawPointer
+    
+    /// The current packed field.
     var packedField: Field = Field(rawValue: 0)
+    
+    /// A pointer to the end of the packed field.
     var packedEnd: UnsafeRawPointer
+    
+    /// A stack of pointers for nested messages.
     var stack: [UnsafeRawPointer] = []
+    
+    /// User-defined information.
     public var userInfo: [CodingUserInfoKey : Any] = [:]
     
+    /// Creates an instance with a data buffer.
     public init(_ data: Data) {
         let nsData = data as NSData
         self.data = nsData
@@ -31,6 +50,7 @@ public struct ProtobufDecoder {
 }
 
 extension ProtobufDecoder {
+    /// Decodes the next field in the data.
     public mutating func nextField() throws -> ProtobufDecoder.Field? {
         guard ptr < end else {
             packedField = Field(rawValue: 0)
@@ -51,6 +71,7 @@ extension ProtobufDecoder {
         return field
     }
     
+    /// Skips the next field in the data.
     public mutating func skipField(_ field: ProtobufDecoder.Field) throws {
         switch field.wireType {
         case .varint:
@@ -74,6 +95,10 @@ extension ProtobufDecoder {
         }
     }
     
+    /// Decodes a boolean(Bool) value field from the data.
+    ///
+    /// - Parameter field: The field to decode.
+    /// - Returns: A boolean(Bool) value.
     public mutating func boolField(_ field: ProtobufDecoder.Field) throws -> Bool {
         switch field.wireType {
         case .varint:
@@ -92,6 +117,10 @@ extension ProtobufDecoder {
         return try decodeVariant() != 0
     }
     
+    /// Decodes an unsigned integer(UInt) value field from the data.
+    ///
+    /// - Parameter field: The field to decode.
+    /// - Returns: An unsigned integer(UInt) value.
     public mutating func uintField(_ field: ProtobufDecoder.Field) throws -> UInt {
         switch field.wireType {
         case .varint:
@@ -110,31 +139,59 @@ extension ProtobufDecoder {
         return try decodeVariant()
     }
     
+    /// Decodes an enum field from the data.
+    ///
+    /// - Parameter field: The field to decode.
+    /// - Returns: A ProtobufEnum value.
     public mutating func enumField<T>(_ field: ProtobufDecoder.Field) throws -> T? where T: ProtobufEnum {
         try T(protobufValue: uintField(field))
     }
     
+    /// Decodes an unsigned 8-bit integer(UInt8) value field from the data.
+    ///
+    /// - Parameter field: The field to decode.
+    /// - Returns: An unsigned 8-bit integer(UInt8) value.
     public mutating func uint8Field(_ field: ProtobufDecoder.Field) throws -> UInt8 {
         try UInt8(uintField(field))
     }
     
+    /// Decodes an unsigned 16-bit integer(UInt16) value field from the data.
+    ///
+    /// - Parameter field: The field to decode.
+    /// - Returns: An unsigned 16-bit integer(UInt16) value.
     public mutating func uint16Field(_ field: ProtobufDecoder.Field) throws -> UInt16 {
         try UInt16(uintField(field))
     }
     
+    /// Decodes an unsigned 32-bit integer(UInt32) value field from the data.
+    ///
+    /// - Parameter field: The field to decode.
+    /// - Returns: An unsigned 32-bit integer(UInt32) value.
     public mutating func uint32Field(_ field: ProtobufDecoder.Field) throws -> UInt32 {
         try UInt32(uintField(field))
     }
     
+    /// Decodes an unsigned 64-bit integer(UInt64) value field from the data.
+    ///
+    /// - Parameter field: The field to decode.
+    /// - Returns: An unsigned 64-bit integer(UInt64) value.
     public mutating func uint64Field(_ field: ProtobufDecoder.Field) throws -> UInt64 {
         try UInt64(uintField(field))
     }
     
+    /// Decodes a signed integer(Int) value field from the data.
+    ///
+    /// - Parameter field: The field to decode.
+    /// - Returns: A signed integer(Int) value.
     public mutating func intField(_ field: ProtobufDecoder.Field) throws -> Int {
         let value = Int(bitPattern: try uintField(field))
         return Int(bitPattern: UInt(bitPattern: (value >> 1)) ^ UInt(bitPattern: -(value & 1)))
     }
     
+    /// Decodes a fixed 32-bit integer(UInt32) value field from the data.
+    ///
+    /// - Parameter field: The field to decode.
+    /// - Returns: A fixed 32-bit integer(UInt32) value.
     public mutating func fixed32Field(_ field: ProtobufDecoder.Field) throws -> UInt32 {
         switch field.wireType {
         case .lengthDelimited:
@@ -159,6 +216,10 @@ extension ProtobufDecoder {
         return value
     }
     
+    /// Decodes a fixed 64-bit integer(UInt64) value field from the data.
+    ///
+    /// - Parameter field: The field to decode.
+    /// - Returns: A fixed 64-bit integer(UInt64) value.
     public mutating func fixed64Field(_ field: ProtobufDecoder.Field) throws -> UInt64 {
         switch field.wireType {
         case .lengthDelimited:
@@ -183,6 +244,10 @@ extension ProtobufDecoder {
         return value
     }
     
+    /// Decodes a float(Float) value field from the data.
+    ///
+    /// - Parameter field: The field to decode.
+    /// - Returns: A float(Float) value.
     public mutating func floatField(_ field: ProtobufDecoder.Field) throws -> Float {
         switch field.wireType {
         case .lengthDelimited:
@@ -207,6 +272,10 @@ extension ProtobufDecoder {
         return Float(bitPattern: value)
     }
     
+    /// Decodes a double(Double) value field from the data.
+    ///
+    /// - Parameter field: The field to decode.
+    /// - Returns: A double(Double) value.
     public mutating func doubleField(_ field: ProtobufDecoder.Field) throws -> Double {
         switch field.wireType {
         case .fixed64:
@@ -239,11 +308,19 @@ extension ProtobufDecoder {
         return Double(bitPattern: value)
     }
     
+    /// Decodes a CGFloat value field from the data.
+    ///
+    /// - Parameter field: The field to decode.
+    /// - Returns: A CGFloat value.
     @inline(__always)
     public mutating func cgFloatField(_ field: ProtobufDecoder.Field) throws -> CGFloat {
         try doubleField(field)
     }
     
+    /// Decodes a data buffer value field from the data.
+    ///
+    /// - Parameter field: The field to decode.
+    /// - Returns: A data buffer value.
     public mutating func dataBufferField(_ field: ProtobufDecoder.Field) throws -> UnsafeRawBufferPointer {
         switch field.wireType {
         case .lengthDelimited:
@@ -253,6 +330,10 @@ extension ProtobufDecoder {
         }
     }
     
+    /// Decodes a data value field from the data.
+    ///
+    /// - Parameter field: The field to decode.
+    /// - Returns: A data value.
     public mutating func dataField(_ field: ProtobufDecoder.Field) throws -> Data {
         switch field.wireType {
         case .lengthDelimited:
@@ -268,6 +349,10 @@ extension ProtobufDecoder {
         }
     }
     
+    /// Decodes a message value field from the data.
+    ///
+    /// - Parameter field: The field to decode.
+    /// - Returns: A ProtobufDecodableMessage value.
     public mutating func messageField<T>(_ field: ProtobufDecoder.Field) throws -> T where T: ProtobufDecodableMessage {
         guard field.wireType == .lengthDelimited else {
             throw DecodingError.failed
@@ -275,6 +360,12 @@ extension ProtobufDecoder {
         return try decodeMessage()
     }
     
+    /// Decodes a message value field from the data.
+    ///
+    /// - Parameters:
+    ///   - field: The field to decode.
+    ///   - body: A closure that decodes the message.
+    /// - Returns: A value decoded from the message.
     public mutating func messageField<T>(_ field: ProtobufDecoder.Field, _ body: (inout ProtobufDecoder) throws -> T) throws -> T {
         guard field.wireType == .lengthDelimited else {
             throw DecodingError.failed
@@ -282,6 +373,10 @@ extension ProtobufDecoder {
         return try decodeMessage(body)
     }
     
+    /// Decodes a string value field from the data.
+    ///
+    /// - Parameter field: The field to decode.
+    /// - Returns: A string value.
     public mutating func stringField(_ field: ProtobufDecoder.Field) throws -> String {
         let data = try dataField(field)
         guard let result = String(data: data, encoding: .utf8) else {
@@ -290,6 +385,10 @@ extension ProtobufDecoder {
         return result
     }
     
+    /// Decodes a codable value field from the data.
+    ///
+    /// - Parameter field: The field to decode.
+    /// - Returns: A codable value.
     public mutating func codableField<T>(_ field: ProtobufDecoder.Field) throws -> T where T: Decodable {
         let data = try dataField(field)
         return try value(fromBinaryPlist: data)
@@ -297,6 +396,7 @@ extension ProtobufDecoder {
 }
 
 extension ProtobufDecoder {
+    /// Decodes a variant from the data.
     private mutating func decodeVariant() throws -> UInt {
         var value: UInt = 0
         var shift: UInt = 0
@@ -314,6 +414,7 @@ extension ProtobufDecoder {
         return value
     }
     
+    /// Decodes a data buffer from the data.
     private mutating func decodeDataBuffer() throws -> UnsafeRawBufferPointer {
         let count = try Int(decodeVariant())
         let oldPtr = ptr
@@ -325,6 +426,7 @@ extension ProtobufDecoder {
         return UnsafeRawBufferPointer(start: oldPtr, count: count)
     }
     
+    /// Begins decoding a message.
     private mutating func beginMessage() throws {
         stack.append(end)
         let count = try Int(decodeVariant())
@@ -335,18 +437,34 @@ extension ProtobufDecoder {
         end = newPtr
     }
     
+    /// Decodes a message from the data.
+    ///
+    /// - Parameters:
+    ///   - body: A closure that decodes the message.
+    /// - Returns: The value decoded from the message.
     private mutating func decodeMessage<T>(_ body: (inout ProtobufDecoder) throws -> T) throws -> T {
         try beginMessage()
         defer { end = stack.removeLast() }
         return try body(&self)
     }
     
+    /// Decodes a message from the data.
+    ///
+    /// - Returns: A ProtobufDecodableMessage value.
     private mutating func decodeMessage<T>() throws -> T where T: ProtobufDecodableMessage {
         try beginMessage()
         defer { end = stack.removeLast() }
         return try T(from: &self)
     }
     
+    /// Decodes a value from a binary plist.
+    ///
+    /// NOTE: This is only available on non-WASI platforms.
+    ///
+    /// - Parameters:
+    ///   - data: The plist data.
+    ///   - type: The type to decode.
+    /// - Returns: The decodable value resulting from the plist data.
     func value<T>(fromBinaryPlist data: Data, type: T.Type = T.self) throws -> T where T: Decodable {
         #if os(WASI)
         fatalError("PropertyListDecoder is not avaiable on WASI")

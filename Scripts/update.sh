@@ -8,7 +8,7 @@ filepath() {
 PACKAGE_ROOT="$(dirname $(dirname $(filepath $0)))"
 
 UPSTREAM_REPO_URL="https://github.com/OpenSwiftUIProject/OpenSwiftUI"
-UPSTREAM_COMMIT_HASH="ab3f0e91bddc98e04aac552cce1059cc4acac9e7"
+UPSTREAM_COMMIT_HASH="724907a185dde986eda20357560e2c11c7fb2623"
 
 REPO_DIR="$PACKAGE_ROOT/.repos/OpenSwiftUI"
 PATCHES_DIR="$PACKAGE_ROOT/Patches"
@@ -18,6 +18,8 @@ SOURCE_DES="$PACKAGE_ROOT/Sources/ProtobufKit"
 
 TEST_DIR="$REPO_DIR/Tests/OpenSwiftUICoreTests/Data/Protobuf"
 TEST_DEST="$PACKAGE_ROOT/Tests/ProtobufKitTests"
+
+rm -rf $REPO_DIR
 
 git clone --depth 1 $UPSTREAM_REPO_URL $REPO_DIR
 cd $REPO_DIR
@@ -38,5 +40,3 @@ cp -r $SOURCE_DIR/* $SOURCE_DES/
 
 mkdir -p $TEST_DEST
 cp -r $TEST_DIR/* $TEST_DEST/
-
-rm -rf $REPO_DIR

@@ -2,7 +2,7 @@
 //  ProtobufDecoder.swift
 //  ProtobufKit
 
-import Foundation
+public import Foundation
 
 /// An object that decodes instances of a data type from protobuf objects.
 public struct ProtobufDecoder {

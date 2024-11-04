@@ -2,7 +2,7 @@
 //  ProtobufEncoder.swift
 //  ProtobufKit
 
-import Foundation
+public import Foundation
 
 /// An object that encodes instances of a data type as protobuf objects.
 public struct ProtobufEncoder {

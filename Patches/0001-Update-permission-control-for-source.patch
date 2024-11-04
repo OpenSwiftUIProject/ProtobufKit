@@ -1,16 +1,16 @@
-From 97c19450444211b2376beb4803c66c300f95593a Mon Sep 17 00:00:00 2001
+From 1192dab74ee93eae03c8948927c50e232f15334d Mon Sep 17 00:00:00 2001
 From: Kyle <kyle201817146@gmail.com>
-Date: Wed, 30 Oct 2024 13:51:49 +0800
+Date: Mon, 4 Nov 2024 18:13:17 +0800
 Subject: [PATCH] Update permission control for source
 
 ---
- .../Data/Protobuf/ProtobufDecoder.swift       |  60 ++++----
- .../Data/Protobuf/ProtobufEncoder.swift       | 128 +++++++++---------
+ .../Data/Protobuf/ProtobufDecoder.swift       |  62 ++++-----
+ .../Data/Protobuf/ProtobufEncoder.swift       | 130 +++++++++---------
  .../Data/Protobuf/ProtobufMessage.swift       |  63 ++++-----
- 3 files changed, 120 insertions(+), 131 deletions(-)
+ 3 files changed, 122 insertions(+), 133 deletions(-)
 
 diff --git a/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufDecoder.swift b/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufDecoder.swift
-index ef3572a..13ab6c3 100644
+index 9b13d7e..f4dab78 100644
 --- a/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufDecoder.swift
 +++ b/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufDecoder.swift
 @@ -1,25 +1,21 @@
@@ -23,7 +23,8 @@ index ef3572a..13ab6c3 100644
 -//  ID: FFA06CAF6B06DC3E21EC75547A0CD421
 +//  ProtobufKit
  
- import Foundation
+-package import Foundation
++public import Foundation
  
  /// An object that decodes instances of a data type from protobuf objects.
 -package struct ProtobufDecoder {
@@ -247,7 +248,7 @@ index ef3572a..13ab6c3 100644
          return try value(fromBinaryPlist: data)
      }
 diff --git a/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufEncoder.swift b/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufEncoder.swift
-index 20c38d1..6bf0291 100644
+index 7f53954..56d563a 100644
 --- a/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufEncoder.swift
 +++ b/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufEncoder.swift
 @@ -1,25 +1,21 @@
@@ -260,7 +261,8 @@ index 20c38d1..6bf0291 100644
 -//  ID: C7B3AAD101AF9EA76FC322BD6EF713E6
 +//  ProtobufKit
  
- import Foundation
+-package import Foundation
++public import Foundation
  
  /// An object that encodes instances of a data type as protobuf objects.
 -package struct ProtobufEncoder {

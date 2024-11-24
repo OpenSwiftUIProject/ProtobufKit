@@ -1,27 +1,21 @@
-From 1192dab74ee93eae03c8948927c50e232f15334d Mon Sep 17 00:00:00 2001
+From bfcf41be7a27cba03c2961fda71f41bfbd6c9d62 Mon Sep 17 00:00:00 2001
 From: Kyle <kyle201817146@gmail.com>
-Date: Mon, 4 Nov 2024 18:13:17 +0800
-Subject: [PATCH] Update permission control for source
+Date: Sun, 24 Nov 2024 23:24:56 +0800
+Subject: [PATCH] Update permission control
 
 ---
- .../Data/Protobuf/ProtobufDecoder.swift       |  62 ++++-----
- .../Data/Protobuf/ProtobufEncoder.swift       | 130 +++++++++---------
- .../Data/Protobuf/ProtobufMessage.swift       |  63 ++++-----
- 3 files changed, 122 insertions(+), 133 deletions(-)
+ .../Data/Protobuf/ProtobufDecoder.swift       |  56 ++++----
+ .../Data/Protobuf/ProtobufEncoder.swift       | 124 +++++++++---------
+ .../Data/Protobuf/ProtobufMessage.swift       |  58 ++++----
+ 3 files changed, 119 insertions(+), 119 deletions(-)
 
 diff --git a/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufDecoder.swift b/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufDecoder.swift
-index 9b13d7e..f4dab78 100644
+index 28c72e5..39e27d5 100644
 --- a/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufDecoder.swift
 +++ b/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufDecoder.swift
-@@ -1,25 +1,21 @@
- //
+@@ -2,20 +2,20 @@
  //  ProtobufDecoder.swift
--//  OpenSwiftUICore
--//
--//  Audited for RELEASE_2024
--//  Status: Complete
--//  ID: FFA06CAF6B06DC3E21EC75547A0CD421
-+//  ProtobufKit
+ //  ProtobufKit
  
 -package import Foundation
 +public import Foundation
@@ -45,7 +39,7 @@ index 9b13d7e..f4dab78 100644
      
      /// The data being decoded.
      var data: NSData
-@@ -40,10 +36,10 @@ package struct ProtobufDecoder {
+@@ -36,10 +36,10 @@ package struct ProtobufDecoder {
      var stack: [UnsafeRawPointer] = []
      
      /// User-defined information.
@@ -58,7 +52,7 @@ index 9b13d7e..f4dab78 100644
          let nsData = data as NSData
          self.data = nsData
          let ptr = nsData.bytes
-@@ -55,7 +51,7 @@ package struct ProtobufDecoder {
+@@ -51,7 +51,7 @@ package struct ProtobufDecoder {
  
  extension ProtobufDecoder {
      /// Decodes the next field in the data.
@@ -67,7 +61,7 @@ index 9b13d7e..f4dab78 100644
          guard ptr < end else {
              packedField = Field(rawValue: 0)
              return nil
-@@ -76,7 +72,7 @@ extension ProtobufDecoder {
+@@ -74,7 +74,7 @@ extension ProtobufDecoder {
      }
      
      /// Skips the next field in the data.
@@ -76,7 +70,7 @@ index 9b13d7e..f4dab78 100644
          switch field.wireType {
          case .varint:
              _ = try decodeVariant()
-@@ -103,7 +99,7 @@ extension ProtobufDecoder {
+@@ -101,7 +101,7 @@ extension ProtobufDecoder {
      ///
      /// - Parameter field: The field to decode.
      /// - Returns: A boolean(Bool) value.
@@ -85,7 +79,7 @@ index 9b13d7e..f4dab78 100644
          switch field.wireType {
          case .varint:
              break
-@@ -125,7 +121,7 @@ extension ProtobufDecoder {
+@@ -123,7 +123,7 @@ extension ProtobufDecoder {
      ///
      /// - Parameter field: The field to decode.
      /// - Returns: An unsigned integer(UInt) value.
@@ -94,7 +88,7 @@ index 9b13d7e..f4dab78 100644
          switch field.wireType {
          case .varint:
              break
-@@ -147,7 +143,7 @@ extension ProtobufDecoder {
+@@ -145,7 +145,7 @@ extension ProtobufDecoder {
      ///
      /// - Parameter field: The field to decode.
      /// - Returns: A ProtobufEnum value.
@@ -103,7 +97,7 @@ index 9b13d7e..f4dab78 100644
          try T(protobufValue: uintField(field))
      }
      
-@@ -155,7 +151,7 @@ extension ProtobufDecoder {
+@@ -153,7 +153,7 @@ extension ProtobufDecoder {
      ///
      /// - Parameter field: The field to decode.
      /// - Returns: An unsigned 8-bit integer(UInt8) value.
@@ -112,7 +106,7 @@ index 9b13d7e..f4dab78 100644
          try UInt8(uintField(field))
      }
      
-@@ -163,7 +159,7 @@ extension ProtobufDecoder {
+@@ -161,7 +161,7 @@ extension ProtobufDecoder {
      ///
      /// - Parameter field: The field to decode.
      /// - Returns: An unsigned 16-bit integer(UInt16) value.
@@ -121,7 +115,7 @@ index 9b13d7e..f4dab78 100644
          try UInt16(uintField(field))
      }
      
-@@ -171,7 +167,7 @@ extension ProtobufDecoder {
+@@ -169,7 +169,7 @@ extension ProtobufDecoder {
      ///
      /// - Parameter field: The field to decode.
      /// - Returns: An unsigned 32-bit integer(UInt32) value.
@@ -130,7 +124,7 @@ index 9b13d7e..f4dab78 100644
          try UInt32(uintField(field))
      }
      
-@@ -179,7 +175,7 @@ extension ProtobufDecoder {
+@@ -177,7 +177,7 @@ extension ProtobufDecoder {
      ///
      /// - Parameter field: The field to decode.
      /// - Returns: An unsigned 64-bit integer(UInt64) value.
@@ -139,7 +133,7 @@ index 9b13d7e..f4dab78 100644
          try UInt64(uintField(field))
      }
      
-@@ -187,7 +183,7 @@ extension ProtobufDecoder {
+@@ -185,7 +185,7 @@ extension ProtobufDecoder {
      ///
      /// - Parameter field: The field to decode.
      /// - Returns: A signed integer(Int) value.
@@ -148,7 +142,7 @@ index 9b13d7e..f4dab78 100644
          let value = Int(bitPattern: try uintField(field))
          return Int(bitPattern: UInt(bitPattern: (value >> 1)) ^ UInt(bitPattern: -(value & 1)))
      }
-@@ -196,7 +192,7 @@ extension ProtobufDecoder {
+@@ -194,7 +194,7 @@ extension ProtobufDecoder {
      ///
      /// - Parameter field: The field to decode.
      /// - Returns: A fixed 32-bit integer(UInt32) value.
@@ -157,7 +151,7 @@ index 9b13d7e..f4dab78 100644
          switch field.wireType {
          case .lengthDelimited:
              let offset = try decodeVariant()
-@@ -224,7 +220,7 @@ extension ProtobufDecoder {
+@@ -222,7 +222,7 @@ extension ProtobufDecoder {
      ///
      /// - Parameter field: The field to decode.
      /// - Returns: A fixed 64-bit integer(UInt64) value.
@@ -166,7 +160,7 @@ index 9b13d7e..f4dab78 100644
          switch field.wireType {
          case .lengthDelimited:
              let offset = try decodeVariant()
-@@ -252,7 +248,7 @@ extension ProtobufDecoder {
+@@ -250,7 +250,7 @@ extension ProtobufDecoder {
      ///
      /// - Parameter field: The field to decode.
      /// - Returns: A float(Float) value.
@@ -175,7 +169,7 @@ index 9b13d7e..f4dab78 100644
          switch field.wireType {
          case .lengthDelimited:
              let offset = try decodeVariant()
-@@ -280,7 +276,7 @@ extension ProtobufDecoder {
+@@ -278,7 +278,7 @@ extension ProtobufDecoder {
      ///
      /// - Parameter field: The field to decode.
      /// - Returns: A double(Double) value.
@@ -184,7 +178,7 @@ index 9b13d7e..f4dab78 100644
          switch field.wireType {
          case .fixed64:
              break
-@@ -317,7 +313,7 @@ extension ProtobufDecoder {
+@@ -315,7 +315,7 @@ extension ProtobufDecoder {
      /// - Parameter field: The field to decode.
      /// - Returns: A CGFloat value.
      @inline(__always)
@@ -193,7 +187,7 @@ index 9b13d7e..f4dab78 100644
          try doubleField(field)
      }
      
-@@ -325,7 +321,7 @@ extension ProtobufDecoder {
+@@ -323,7 +323,7 @@ extension ProtobufDecoder {
      ///
      /// - Parameter field: The field to decode.
      /// - Returns: A data buffer value.
@@ -202,7 +196,7 @@ index 9b13d7e..f4dab78 100644
          switch field.wireType {
          case .lengthDelimited:
              try decodeDataBuffer()
-@@ -338,7 +334,7 @@ extension ProtobufDecoder {
+@@ -336,7 +336,7 @@ extension ProtobufDecoder {
      ///
      /// - Parameter field: The field to decode.
      /// - Returns: A data value.
@@ -211,7 +205,7 @@ index 9b13d7e..f4dab78 100644
          switch field.wireType {
          case .lengthDelimited:
              let buffer = try decodeDataBuffer()
-@@ -357,7 +353,7 @@ extension ProtobufDecoder {
+@@ -355,7 +355,7 @@ extension ProtobufDecoder {
      ///
      /// - Parameter field: The field to decode.
      /// - Returns: A ProtobufDecodableMessage value.
@@ -220,7 +214,7 @@ index 9b13d7e..f4dab78 100644
          guard field.wireType == .lengthDelimited else {
              throw DecodingError.failed
          }
-@@ -370,7 +366,7 @@ extension ProtobufDecoder {
+@@ -368,7 +368,7 @@ extension ProtobufDecoder {
      ///   - field: The field to decode.
      ///   - body: A closure that decodes the message.
      /// - Returns: A value decoded from the message.
@@ -229,7 +223,7 @@ index 9b13d7e..f4dab78 100644
          guard field.wireType == .lengthDelimited else {
              throw DecodingError.failed
          }
-@@ -381,7 +377,7 @@ extension ProtobufDecoder {
+@@ -379,7 +379,7 @@ extension ProtobufDecoder {
      ///
      /// - Parameter field: The field to decode.
      /// - Returns: A string value.
@@ -238,7 +232,7 @@ index 9b13d7e..f4dab78 100644
          let data = try dataField(field)
          guard let result = String(data: data, encoding: .utf8) else {
              throw DecodingError.failed
-@@ -393,7 +389,7 @@ extension ProtobufDecoder {
+@@ -391,7 +391,7 @@ extension ProtobufDecoder {
      ///
      /// - Parameter field: The field to decode.
      /// - Returns: A codable value.
@@ -248,18 +242,12 @@ index 9b13d7e..f4dab78 100644
          return try value(fromBinaryPlist: data)
      }
 diff --git a/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufEncoder.swift b/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufEncoder.swift
-index 7f53954..56d563a 100644
+index cecdfb5..0fe7d46 100644
 --- a/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufEncoder.swift
 +++ b/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufEncoder.swift
-@@ -1,25 +1,21 @@
- //
+@@ -2,20 +2,20 @@
  //  ProtobufEncoder.swift
--//  OpenSwiftUICore
--//
--//  Audited for RELEASE_2024
--//  Status: Complete
--//  ID: C7B3AAD101AF9EA76FC322BD6EF713E6
-+//  ProtobufKit
+ //  ProtobufKit
  
 -package import Foundation
 +public import Foundation
@@ -283,7 +271,7 @@ index 7f53954..56d563a 100644
      
      /// The buffer being encoded.
      var buffer: UnsafeMutableRawPointer!
-@@ -34,7 +30,7 @@ package struct ProtobufEncoder {
+@@ -30,7 +30,7 @@ package struct ProtobufEncoder {
      var stack: [Int] = []
      
      /// User-defined information.
@@ -292,7 +280,7 @@ index 7f53954..56d563a 100644
      
      /// Takes the encoded data.
      ///
-@@ -52,7 +48,7 @@ package struct ProtobufEncoder {
+@@ -48,7 +48,7 @@ package struct ProtobufEncoder {
      /// - Parameters:
      ///   - body: A closure that encodes the value.
      /// - Returns: The encoded data.
@@ -301,7 +289,7 @@ index 7f53954..56d563a 100644
          var encoder = ProtobufEncoder()
          try body(&encoder)
          defer { free(encoder.buffer) }
-@@ -64,7 +60,7 @@ package struct ProtobufEncoder {
+@@ -60,7 +60,7 @@ package struct ProtobufEncoder {
      /// - Parameters:
      ///   - value: The value to encode.
      /// - Returns: The encoded data.
@@ -310,7 +298,7 @@ index 7f53954..56d563a 100644
          try encoding { encoder in
              try value.encode(to: &encoder)
          }
-@@ -143,7 +139,7 @@ extension ProtobufEncoder {
+@@ -139,7 +139,7 @@ extension ProtobufEncoder {
      ///   - value: The value to encode.
      ///   - defaultValue: The default value of the field.
      @inline(__always)
@@ -319,7 +307,7 @@ index 7f53954..56d563a 100644
          guard value != defaultValue else { return }
          let field = Field(tag, wireType: .varint)
          encodeVarint(field.rawValue)
-@@ -157,7 +153,7 @@ extension ProtobufEncoder {
+@@ -153,7 +153,7 @@ extension ProtobufEncoder {
      ///   - value: The value to encode.
      ///   - defaultValue: The default value of the field.
      @inline(__always)
@@ -328,7 +316,7 @@ index 7f53954..56d563a 100644
          guard value != defaultValue else { return }
          let field = Field(tag, wireType: .varint)
          encodeVarint(field.rawValue)
-@@ -171,7 +167,7 @@ extension ProtobufEncoder {
+@@ -167,7 +167,7 @@ extension ProtobufEncoder {
      ///   - value: The value to encode.
      ///   - defaultValue: The default value of the field.
      @inline(__always)
@@ -337,7 +325,7 @@ index 7f53954..56d563a 100644
          guard value != defaultValue else { return }
          enumField(tag, value)
      }
-@@ -182,7 +178,7 @@ extension ProtobufEncoder {
+@@ -178,7 +178,7 @@ extension ProtobufEncoder {
      ///   - tag: The tag of the field.
      ///   - value: The value to encode.
      @inline(__always)
@@ -346,7 +334,7 @@ index 7f53954..56d563a 100644
          let field = Field(tag, wireType: .varint)
          encodeVarint(field.rawValue)
          encodeVarint(value.protobufValue)
-@@ -195,7 +191,7 @@ extension ProtobufEncoder {
+@@ -191,7 +191,7 @@ extension ProtobufEncoder {
      ///   - value: The value to encode.
      ///   - defaultValue: The default value of the field.
      @inline(__always)
@@ -355,7 +343,7 @@ index 7f53954..56d563a 100644
          guard value != defaultValue else { return }
          let field = Field(tag, wireType: .varint)
          encodeVarint(field.rawValue)
-@@ -209,7 +205,7 @@ extension ProtobufEncoder {
+@@ -205,7 +205,7 @@ extension ProtobufEncoder {
      ///   - value: The value to encode.
      ///   - defaultValue: The default value of the field.
      @inline(__always)
@@ -364,7 +352,7 @@ index 7f53954..56d563a 100644
          guard value != defaultValue else { return }
          let field = Field(tag, wireType: .varint)
          encodeVarint(field.rawValue)
-@@ -223,7 +219,7 @@ extension ProtobufEncoder {
+@@ -219,7 +219,7 @@ extension ProtobufEncoder {
      ///   - value: The value to encode.
      ///   - defaultValue: The default value of the field.
      @inline(__always)
@@ -373,7 +361,7 @@ index 7f53954..56d563a 100644
          guard value != defaultValue else { return }
          let field = Field(tag, wireType: .varint)
          encodeVarint(field.rawValue)
-@@ -237,7 +233,7 @@ extension ProtobufEncoder {
+@@ -233,7 +233,7 @@ extension ProtobufEncoder {
      ///   - value: The value to encode.
      ///   - defaultValue: The default value of the field.
      @inline(__always)
@@ -382,7 +370,7 @@ index 7f53954..56d563a 100644
          guard value != defaultValue else { return }
          let field = Field(tag, wireType: .fixed32)
          encodeVarint(field.rawValue)
-@@ -251,7 +247,7 @@ extension ProtobufEncoder {
+@@ -247,7 +247,7 @@ extension ProtobufEncoder {
      ///   - value: The value to encode.
      ///   - defaultValue: The default value of the field.
      @inline(__always)
@@ -391,7 +379,7 @@ index 7f53954..56d563a 100644
          guard value != defaultValue else { return }
          let field = Field(tag, wireType: .fixed64)
          encodeVarint(field.rawValue)
-@@ -265,7 +261,7 @@ extension ProtobufEncoder {
+@@ -261,7 +261,7 @@ extension ProtobufEncoder {
      ///   - value: The value to encode.
      ///   - defaultValue: The default value of the field.
      @inline(__always)
@@ -400,7 +388,7 @@ index 7f53954..56d563a 100644
          guard value != defaultValue else { return }
          let field = Field(tag, wireType: .fixed32)
          encodeVarint(field.rawValue)
-@@ -279,7 +275,7 @@ extension ProtobufEncoder {
+@@ -275,7 +275,7 @@ extension ProtobufEncoder {
      ///   - value: The value to encode.
      ///   - defaultValue: The default value of the field.
      @inline(__always)
@@ -409,7 +397,7 @@ index 7f53954..56d563a 100644
          guard value != defaultValue else { return }
          let field = Field(tag, wireType: .fixed64)
          encodeVarint(field.rawValue)
-@@ -293,7 +289,7 @@ extension ProtobufEncoder {
+@@ -289,7 +289,7 @@ extension ProtobufEncoder {
      ///   - value: The value to encode.
      ///   - defaultValue: The default value of the field.
      @inline(__always)
@@ -418,7 +406,7 @@ index 7f53954..56d563a 100644
          guard value != defaultValue else { return }
          let field = Field(tag, wireType: value < 65536.0 ? .fixed32 : .fixed64)
          encodeVarint(field.rawValue)
-@@ -309,7 +305,7 @@ extension ProtobufEncoder {
+@@ -305,7 +305,7 @@ extension ProtobufEncoder {
      /// - Parameters:
      ///   - tag: The tag of the field.
      ///   - value: The value to encode.
@@ -427,7 +415,7 @@ index 7f53954..56d563a 100644
          value.withUnsafeBytes { buffer in
              dataField(tag, buffer)
          }
-@@ -320,7 +316,7 @@ extension ProtobufEncoder {
+@@ -316,7 +316,7 @@ extension ProtobufEncoder {
      /// - Parameters:
      ///   - tag: The tag of the field.
      ///   - value: The value to encode.
@@ -436,7 +424,7 @@ index 7f53954..56d563a 100644
          guard !value.isEmpty else {
              return
          }
-@@ -335,7 +331,7 @@ extension ProtobufEncoder {
+@@ -331,7 +331,7 @@ extension ProtobufEncoder {
      ///   - tag: The tag of the field.
      ///   - body: A closure that encodes the value.
      @inline(__always)
@@ -445,7 +433,7 @@ index 7f53954..56d563a 100644
          let field = Field(tag, wireType: .lengthDelimited)
          encodeVarint(field.rawValue)
          stack.append(size)
-@@ -350,7 +346,7 @@ extension ProtobufEncoder {
+@@ -346,7 +346,7 @@ extension ProtobufEncoder {
      ///   - tag: The tag of the field.
      ///   - body: A closure that encodes the value.
      @inline(__always)
@@ -454,7 +442,7 @@ index 7f53954..56d563a 100644
          let field = Field(tag, wireType: .lengthDelimited)
          encodeVarint(field.rawValue)
          stack.append(size)
-@@ -366,7 +362,7 @@ extension ProtobufEncoder {
+@@ -362,7 +362,7 @@ extension ProtobufEncoder {
      ///   - value: The value to encode.
      ///   - defaultValue: The default value of the field.
      @inline(__always)
@@ -463,7 +451,7 @@ index 7f53954..56d563a 100644
          guard value != defaultValue else { return }
          try messageField(tag, value)
      }
-@@ -376,7 +372,7 @@ extension ProtobufEncoder {
+@@ -372,7 +372,7 @@ extension ProtobufEncoder {
      /// - Parameters:
      ///   - tag: The tag of the field.
      ///   - value: The value to encode.
@@ -472,7 +460,7 @@ index 7f53954..56d563a 100644
          let field = Field(tag, wireType: .lengthDelimited)
          encodeVarint(field.rawValue)
          try encodeMessage(value)
-@@ -401,7 +397,7 @@ extension ProtobufEncoder {
+@@ -397,7 +397,7 @@ extension ProtobufEncoder {
      ///   - value: The value to encode.
      ///   - defaultValue: The default value of the field.
      @inline(__always)
@@ -481,7 +469,7 @@ index 7f53954..56d563a 100644
          guard value != defaultValue else { return }
          try stringFieldAlways(tag, value)
      }
-@@ -431,7 +427,7 @@ extension ProtobufEncoder {
+@@ -427,7 +427,7 @@ extension ProtobufEncoder {
      ///   - value: The value to encode.
      ///   - defaultValue: The default value of the field.
      @inline(__always)
@@ -490,7 +478,7 @@ index 7f53954..56d563a 100644
          guard value != defaultValue else { return }
          try codableField(tag, value)
      }
-@@ -441,7 +437,7 @@ extension ProtobufEncoder {
+@@ -437,7 +437,7 @@ extension ProtobufEncoder {
      /// - Parameters:
      ///   - tag: The tag of the field.
      ///   - value: The value to encode.
@@ -499,7 +487,7 @@ index 7f53954..56d563a 100644
          let field = Field(tag, wireType: .lengthDelimited)
          encodeVarint(field.rawValue)
          let data = try binaryPlistData(for: value)
-@@ -454,7 +450,7 @@ extension ProtobufEncoder {
+@@ -450,7 +450,7 @@ extension ProtobufEncoder {
      ///
      /// - Parameters:
      ///   - tag: The tag of the field.
@@ -508,7 +496,7 @@ index 7f53954..56d563a 100644
          let field = Field(tag, wireType: .lengthDelimited)
          encodeVarint(field.rawValue)
          stack.append(size)
-@@ -472,7 +468,7 @@ extension ProtobufEncoder {
+@@ -468,7 +468,7 @@ extension ProtobufEncoder {
      ///   - value: The value to encode.
      ///   - defaultValue: The default value of the field.
      @inline(__always)
@@ -517,7 +505,7 @@ index 7f53954..56d563a 100644
          boolField(tag.rawValue, value, defaultValue: defaultValue)
      }
      
-@@ -483,7 +479,7 @@ extension ProtobufEncoder {
+@@ -479,7 +479,7 @@ extension ProtobufEncoder {
      ///   - value: The value to encode.
      ///   - defaultValue: The default value of the field.
      @inline(__always)
@@ -526,7 +514,7 @@ index 7f53954..56d563a 100644
          uintField(tag.rawValue, value, defaultValue: defaultValue)
      }
      
-@@ -494,7 +490,7 @@ extension ProtobufEncoder {
+@@ -490,7 +490,7 @@ extension ProtobufEncoder {
      ///   - value: The value to encode.
      ///   - defaultValue: The default value of the field.
      @inline(__always)
@@ -535,7 +523,7 @@ index 7f53954..56d563a 100644
          enumField(tag.rawValue, value, defaultValue: defaultValue)
      }
      
-@@ -504,7 +500,7 @@ extension ProtobufEncoder {
+@@ -500,7 +500,7 @@ extension ProtobufEncoder {
      ///   - tag: The tag of the field.
      ///   - value: The value to encode.
      @inline(__always)
@@ -544,7 +532,7 @@ index 7f53954..56d563a 100644
          enumField(tag.rawValue, value)
      }
      
-@@ -515,7 +511,7 @@ extension ProtobufEncoder {
+@@ -511,7 +511,7 @@ extension ProtobufEncoder {
      ///   - value: The value to encode.
      ///   - defaultValue: The default value of the field.
      @inline(__always)
@@ -553,7 +541,7 @@ index 7f53954..56d563a 100644
          uint64Field(tag.rawValue, value, defaultValue: defaultValue)
      }
      
-@@ -526,7 +522,7 @@ extension ProtobufEncoder {
+@@ -522,7 +522,7 @@ extension ProtobufEncoder {
      ///   - value: The value to encode.
      ///   - defaultValue: The default value of the field.
      @inline(__always)
@@ -562,7 +550,7 @@ index 7f53954..56d563a 100644
          intField(tag.rawValue, value, defaultValue: defaultValue)
      }
      
-@@ -537,7 +533,7 @@ extension ProtobufEncoder {
+@@ -533,7 +533,7 @@ extension ProtobufEncoder {
      ///   - value: The value to encode.
      ///   - defaultValue: The default value of the field.
      @inline(__always)
@@ -571,7 +559,7 @@ index 7f53954..56d563a 100644
          int64Field(tag.rawValue, value, defaultValue: defaultValue)
      }
      
-@@ -548,7 +544,7 @@ extension ProtobufEncoder {
+@@ -544,7 +544,7 @@ extension ProtobufEncoder {
      ///   - value: The value to encode.
      ///   - defaultValue: The default value of the field.
      @inline(__always)
@@ -580,7 +568,7 @@ index 7f53954..56d563a 100644
          fixed32Field(tag.rawValue, value, defaultValue: defaultValue)
      }
      
-@@ -559,7 +555,7 @@ extension ProtobufEncoder {
+@@ -555,7 +555,7 @@ extension ProtobufEncoder {
      ///   - value: The value to encode.
      ///   - defaultValue: The default value of the field.
      @inline(__always)
@@ -589,7 +577,7 @@ index 7f53954..56d563a 100644
          fixed64Field(tag.rawValue, value, defaultValue: defaultValue)
      }
      
-@@ -570,7 +566,7 @@ extension ProtobufEncoder {
+@@ -566,7 +566,7 @@ extension ProtobufEncoder {
      ///   - value: The value to encode.
      ///   - defaultValue: The default value of the field.
      @inline(__always)
@@ -598,7 +586,7 @@ index 7f53954..56d563a 100644
          floatField(tag.rawValue, value, defaultValue: defaultValue)
      }
      
-@@ -581,7 +577,7 @@ extension ProtobufEncoder {
+@@ -577,7 +577,7 @@ extension ProtobufEncoder {
      ///   - value: The value to encode.
      ///   - defaultValue: The default value of the field.
      @inline(__always)
@@ -607,7 +595,7 @@ index 7f53954..56d563a 100644
          doubleField(tag.rawValue, value, defaultValue: defaultValue)
      }
      
-@@ -592,7 +588,7 @@ extension ProtobufEncoder {
+@@ -588,7 +588,7 @@ extension ProtobufEncoder {
      ///   - value: The value to encode.
      ///   - defaultValue: The default value of the field.
      @inline(__always)
@@ -616,7 +604,7 @@ index 7f53954..56d563a 100644
          cgFloatField(tag.rawValue, value, defaultValue: defaultValue)
      }
      
-@@ -602,7 +598,7 @@ extension ProtobufEncoder {
+@@ -598,7 +598,7 @@ extension ProtobufEncoder {
      ///   - tag: The tag of the field.
      ///   - value: The value to encode.
      @inline(__always)
@@ -625,7 +613,7 @@ index 7f53954..56d563a 100644
          dataField(tag.rawValue, value)
      }
      
-@@ -612,7 +608,7 @@ extension ProtobufEncoder {
+@@ -608,7 +608,7 @@ extension ProtobufEncoder {
      ///   - tag: The tag of the field.
      ///   - value: The value to encode.
      @inline(__always)
@@ -634,7 +622,7 @@ index 7f53954..56d563a 100644
          dataField(tag.rawValue, value)
      }
      
-@@ -622,7 +618,7 @@ extension ProtobufEncoder {
+@@ -618,7 +618,7 @@ extension ProtobufEncoder {
      ///   - tag: The tag of the field.
      ///   - body: A closure that encodes the value.
      @inline(__always)
@@ -643,7 +631,7 @@ index 7f53954..56d563a 100644
          packedField(tag.rawValue, body)
      }
      
-@@ -632,7 +628,7 @@ extension ProtobufEncoder {
+@@ -628,7 +628,7 @@ extension ProtobufEncoder {
      ///   - tag: The tag of the field.
      ///   - body: A closure that encodes the value.
      @inline(__always)
@@ -652,7 +640,7 @@ index 7f53954..56d563a 100644
          try messageField(tag.rawValue, body)
      }
      
-@@ -643,7 +639,7 @@ extension ProtobufEncoder {
+@@ -639,7 +639,7 @@ extension ProtobufEncoder {
      ///   - value: The value to encode.
      ///   - defaultValue: The default value of the field.
      @inline(__always)
@@ -661,7 +649,7 @@ index 7f53954..56d563a 100644
          try messageField(tag.rawValue, value, defaultValue: defaultValue)
      }
      
-@@ -653,7 +649,7 @@ extension ProtobufEncoder {
+@@ -649,7 +649,7 @@ extension ProtobufEncoder {
      ///   - tag: The tag of the field.
      ///   - value: The value to encode.
      @inline(__always)
@@ -670,7 +658,7 @@ index 7f53954..56d563a 100644
          try messageField(tag.rawValue, value)
      }
      
-@@ -664,7 +660,7 @@ extension ProtobufEncoder {
+@@ -660,7 +660,7 @@ extension ProtobufEncoder {
      ///   - value: The value to encode.
      ///   - defaultValue: The default value of the field.
      @inline(__always)
@@ -679,7 +667,7 @@ index 7f53954..56d563a 100644
          try stringField(tag.rawValue, value, defaultValue: defaultValue)
      }
      
-@@ -675,7 +671,7 @@ extension ProtobufEncoder {
+@@ -671,7 +671,7 @@ extension ProtobufEncoder {
      ///   - value: The value to encode.
      ///   - defaultValue: The default value of the field.
      @inline(__always)
@@ -688,7 +676,7 @@ index 7f53954..56d563a 100644
          try codableField(tag.rawValue, value, defaultValue: defaultValue)
      }
      
-@@ -685,7 +681,7 @@ extension ProtobufEncoder {
+@@ -681,7 +681,7 @@ extension ProtobufEncoder {
      ///   - tag: The tag of the field.
      ///   - value: The value to encode.
      @inline(__always)
@@ -697,7 +685,7 @@ index 7f53954..56d563a 100644
          try codableField(tag.rawValue, value)
      }
  }
-@@ -695,7 +691,7 @@ extension ProtobufEncoder {
+@@ -691,7 +691,7 @@ extension ProtobufEncoder {
      ///
      /// - Parameters:
      ///   - value: The value to encode.
@@ -706,7 +694,7 @@ index 7f53954..56d563a 100644
          let highBit = 64 - (value | 1).leadingZeroBitCount
          let count = (highBit + 6) / 7
          let oldSize = size
-@@ -719,7 +715,7 @@ extension ProtobufEncoder {
+@@ -715,7 +715,7 @@ extension ProtobufEncoder {
      }
      
      /// Encodes a varint.
@@ -715,7 +703,7 @@ index 7f53954..56d563a 100644
          encodeVarint(UInt(value))
      }
      
-@@ -729,7 +725,7 @@ extension ProtobufEncoder {
+@@ -725,7 +725,7 @@ extension ProtobufEncoder {
      ///
      /// - Parameters:
      ///   - value: The value to encode.
@@ -724,7 +712,7 @@ index 7f53954..56d563a 100644
          encodeVarint(UInt(bitPattern: (value << 1) ^ (value >> 63)))
      }
      
-@@ -737,7 +733,7 @@ extension ProtobufEncoder {
+@@ -733,7 +733,7 @@ extension ProtobufEncoder {
      ///
      /// - Parameters:
      ///   - value: The value to encode.
@@ -733,7 +721,7 @@ index 7f53954..56d563a 100644
          encodeVarintZZ(Int(value))
      }
      
-@@ -779,7 +775,7 @@ extension ProtobufEncoder {
+@@ -757,7 +757,7 @@ extension ProtobufEncoder {
      ///
      /// - Parameters:
      ///   - value: The value to encode.
@@ -742,7 +730,7 @@ index 7f53954..56d563a 100644
          encodeBitwiseCopyable(value)
      }
      
-@@ -787,7 +783,7 @@ extension ProtobufEncoder {
+@@ -765,7 +765,7 @@ extension ProtobufEncoder {
      ///
      /// - Parameters:
      ///   - value: The value to encode.
@@ -751,7 +739,7 @@ index 7f53954..56d563a 100644
          encodeBitwiseCopyable(value)
      }
      
-@@ -795,7 +791,7 @@ extension ProtobufEncoder {
+@@ -773,7 +773,7 @@ extension ProtobufEncoder {
      ///
      /// - Parameters:
      ///   - value: The value to encode.
@@ -760,7 +748,7 @@ index 7f53954..56d563a 100644
          encodeBitwiseCopyable(value)
      }
      
-@@ -803,7 +799,7 @@ extension ProtobufEncoder {
+@@ -781,7 +781,7 @@ extension ProtobufEncoder {
      ///
      /// - Parameters:
      ///   - value: The value to encode.
@@ -769,7 +757,7 @@ index 7f53954..56d563a 100644
          encodeBitwiseCopyable(value)
      }
      
-@@ -811,7 +807,7 @@ extension ProtobufEncoder {
+@@ -789,7 +789,7 @@ extension ProtobufEncoder {
      ///
      /// - Parameters:
      ///   - value: The value to encode.
@@ -778,7 +766,7 @@ index 7f53954..56d563a 100644
          encodeBitwiseCopyable(value)
      }
      
-@@ -819,7 +815,7 @@ extension ProtobufEncoder {
+@@ -797,7 +797,7 @@ extension ProtobufEncoder {
      ///
      /// - Parameters:
      ///   - dataBuffer: The data to encode.
@@ -787,7 +775,7 @@ index 7f53954..56d563a 100644
          // Encode LEN
          let dataBufferCount = dataBuffer.count
          encodeVarint(UInt(bitPattern: dataBufferCount))
-@@ -844,7 +840,7 @@ extension ProtobufEncoder {
+@@ -822,7 +822,7 @@ extension ProtobufEncoder {
      ///
      /// - Parameters:
      ///   - value: The value to encode.
@@ -797,20 +785,10 @@ index 7f53954..56d563a 100644
          size += 1
          try value.encode(to: &self)
 diff --git a/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufMessage.swift b/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufMessage.swift
-index 216500f..bcbf1d8 100644
+index 5ed6b1e..bcbf1d8 100644
 --- a/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufMessage.swift
 +++ b/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufMessage.swift
-@@ -1,16 +1,13 @@
- //
- //  ProtobufMessage.swift
--//  OpenSwiftUICore
--//
--//  Audited for RELEASE_2024
--//  Status: Complete
-+//  ProtobufKit
- 
- import Foundation
- 
+@@ -7,7 +7,7 @@ import Foundation
  // MARK: - ProtobufMessage
  
  /// A type that can encode itself to a protobuf representation.
@@ -819,7 +797,7 @@ index 216500f..bcbf1d8 100644
      /// Encodes this value into the given encoder.
      ///
      /// If the value fails to encode anything, `encoder` will encode an empty
-@@ -24,7 +21,7 @@ package protocol ProtobufEncodableMessage {
+@@ -21,7 +21,7 @@ package protocol ProtobufEncodableMessage {
  }
  
  /// A  type that can decode itself from a protobuf representation.
@@ -828,7 +806,7 @@ index 216500f..bcbf1d8 100644
      /// Creates a new instance by decoding from the given decoder.
      ///
      /// This initializer throws an error if reading from the decoder fails, or
-@@ -40,12 +37,12 @@ package protocol ProtobufDecodableMessage {
+@@ -37,12 +37,12 @@ package protocol ProtobufDecodableMessage {
  /// `ProtobufMessage` is a type alias for the `ProtobufEncodableMessage` and `ProtobufDecodableMessage` protocols.
  /// When you use `ProtobufMessage` as a type or a generic constraint, it matches
  /// any type that conforms to both protocols.
@@ -843,7 +821,7 @@ index 216500f..bcbf1d8 100644
      /// The value of the enum as a protobuf enum.
      var protobufValue: UInt { get }
  
-@@ -55,12 +52,12 @@ package protocol ProtobufEnum {
+@@ -52,12 +52,12 @@ package protocol ProtobufEnum {
  
  extension ProtobufEnum where Self: RawRepresentable, RawValue: BinaryInteger {
      /// The value of the enum as a protobuf enum.
@@ -858,7 +836,7 @@ index 216500f..bcbf1d8 100644
          self.init(rawValue: RawValue(protobufValue))
      }
  }
-@@ -70,7 +67,7 @@ extension ProtobufEnum where Self: RawRepresentable, RawValue: BinaryInteger {
+@@ -67,7 +67,7 @@ extension ProtobufEnum where Self: RawRepresentable, RawValue: BinaryInteger {
  /// A protocol representing a tag in protobuf encoding.
  ///
  /// Conforms to `Equatable` to allow comparison of tags.
@@ -867,7 +845,7 @@ index 216500f..bcbf1d8 100644
      /// The raw value of the tag.
      var rawValue: UInt { get }
  
-@@ -81,37 +78,37 @@ package protocol ProtobufTag: Equatable {
+@@ -78,37 +78,37 @@ package protocol ProtobufTag: Equatable {
  // MARK: - ProtobufFormat
  
  /// A type representing the format of a protobuf encoding.
@@ -916,7 +894,7 @@ index 216500f..bcbf1d8 100644
              self.rawValue = rawValue
          }
          
-@@ -119,23 +116,23 @@ package enum ProtobufFormat {
+@@ -116,23 +116,23 @@ package enum ProtobufFormat {
          // See https://protobuf.dev/programming-guides/encoding/
  
          /// Creates an instance from a tag and wire type.
@@ -944,7 +922,7 @@ index 216500f..bcbf1d8 100644
              T(rawValue: tag)
          }
      }
-@@ -144,7 +141,7 @@ package enum ProtobufFormat {
+@@ -141,7 +141,7 @@ package enum ProtobufFormat {
  // MARK: - CoddleByProtobuf
  
  /// A type that can be encoded and decoded using protobuf.
@@ -953,7 +931,7 @@ index 216500f..bcbf1d8 100644
  
  extension CodaleByProtobuf {
      /// Encodes the value to a protobuf representation.
-@@ -171,17 +168,17 @@ extension CodaleByProtobuf {
+@@ -168,17 +168,17 @@ extension CodaleByProtobuf {
  
  /// A property wrapper that encodes and decodes a value using protobuf.
  @propertyWrapper
@@ -975,7 +953,7 @@ index 216500f..bcbf1d8 100644
          let data = try ProtobufEncoder.encoding { protobufEncoder in
              protobufEncoder.userInfo = encoder.userInfo
              try wrappedValue.encode(to: &protobufEncoder)
-@@ -191,7 +188,7 @@ package struct ProtobufCodable<Value>: Codable where Value: ProtobufMessage {
+@@ -188,7 +188,7 @@ package struct ProtobufCodable<Value>: Codable where Value: ProtobufMessage {
      }
  
      /// Creates an instance from a decoder.
@@ -984,7 +962,7 @@ index 216500f..bcbf1d8 100644
          let container = try decoder.singleValueContainer()
          let data = try container.decode(Data.self)
          var protobufDecoder = ProtobufDecoder(data)
-@@ -202,7 +199,7 @@ package struct ProtobufCodable<Value>: Codable where Value: ProtobufMessage {
+@@ -199,7 +199,7 @@ package struct ProtobufCodable<Value>: Codable where Value: ProtobufMessage {
  
  extension ProtobufCodable: Equatable where Value: Equatable {
      /// Compares two instances of `ProtobufCodable`.
@@ -994,5 +972,5 @@ index 216500f..bcbf1d8 100644
      }
  }
 -- 
-2.39.5 (Apple Git-154)
+2.47.0
 

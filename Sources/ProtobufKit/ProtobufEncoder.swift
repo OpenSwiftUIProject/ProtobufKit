@@ -411,7 +411,7 @@ extension ProtobufEncoder {
     /// - Returns: The encoded binary plist data.
     func binaryPlistData<T>(for value: T) throws -> Data where T: Encodable {
         #if os(WASI)
-        fatalError("PropertyListEncoder is not avaiable on WASI")
+        preconditionFailure("PropertyListEncoder is not avaiable on WASI")
         #else
         let encoder = PropertyListEncoder()
         encoder.outputFormat = .binary
@@ -737,7 +737,6 @@ extension ProtobufEncoder {
         encodeVarintZZ(Int(value))
     }
     
-    #if compiler(>=6.0)
     /// Encodes a bitwise copyable value.
     ///
     /// - Parameters:
@@ -753,23 +752,6 @@ extension ProtobufEncoder {
             buffer.advanced(by: oldSize).storeBytes(of: value, as: T.self)
         }
     }
-    #else // FIXME: Remove this after we drop WASI 5.10 support
-    /// Encodes a bitwise copyable value.
-    ///
-    /// - Parameters:
-    ///   - value: The value to encode.
-    @inline(__always)
-    private mutating func encodeBitwiseCopyable<T>(_ value: T) {
-        let oldSize = size
-        let newSize = oldSize + MemoryLayout<T>.size
-        if capacity < newSize {
-            growBufferSlow(to: newSize).storeBytes(of: value, as: T.self)
-        } else {
-            size = newSize
-            buffer.advanced(by: oldSize).storeBytes(of: value, as: T.self)
-        }
-    }
-    #endif
     
     /// Encodes a boolean value.
     ///

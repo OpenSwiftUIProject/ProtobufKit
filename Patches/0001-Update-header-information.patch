@@ -1,0 +1,113 @@
+From d7da544a2e3a577f6526b0ca686e2976f3ca6c9d Mon Sep 17 00:00:00 2001
+From: Kyle <kyle201817146@gmail.com>
+Date: Sun, 24 Nov 2024 23:33:29 +0800
+Subject: [PATCH] Update header information
+
+---
+ Sources/OpenSwiftUICore/Data/Protobuf/ProtobufDecoder.swift | 6 +-----
+ Sources/OpenSwiftUICore/Data/Protobuf/ProtobufEncoder.swift | 6 +-----
+ Sources/OpenSwiftUICore/Data/Protobuf/ProtobufMessage.swift | 5 +----
+ .../Data/Protobuf/ProtobufDecoderTests.swift                | 2 +-
+ .../Data/Protobuf/ProtobufEncoderTests.swift                | 2 +-
+ .../Data/Protobuf/ProtobufMessageTests.swift                | 2 +-
+ .../Data/Protobuf/ProtobufTestHelper.swift                  | 2 +-
+ 7 files changed, 7 insertions(+), 18 deletions(-)
+
+diff --git a/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufDecoder.swift b/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufDecoder.swift
+index e7a526e..28c72e5 100644
+--- a/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufDecoder.swift
++++ b/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufDecoder.swift
+@@ -1,10 +1,6 @@
+ //
+ //  ProtobufDecoder.swift
+-//  OpenSwiftUICore
+-//
+-//  Audited for iOS 18.0
+-//  Status: Complete
+-//  ID: FFA06CAF6B06DC3E21EC75547A0CD421 (SwiftUICore)
++//  ProtobufKit
+ 
+ package import Foundation
+ 
+diff --git a/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufEncoder.swift b/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufEncoder.swift
+index 2f71da7..cecdfb5 100644
+--- a/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufEncoder.swift
++++ b/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufEncoder.swift
+@@ -1,10 +1,6 @@
+ //
+ //  ProtobufEncoder.swift
+-//  OpenSwiftUICore
+-//
+-//  Audited for iOS 18.0
+-//  Status: Complete
+-//  ID: C7B3AAD101AF9EA76FC322BD6EF713E6 (SwiftUICore)
++//  ProtobufKit
+ 
+ package import Foundation
+ 
+diff --git a/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufMessage.swift b/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufMessage.swift
+index b74778c..5ed6b1e 100644
+--- a/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufMessage.swift
++++ b/Sources/OpenSwiftUICore/Data/Protobuf/ProtobufMessage.swift
+@@ -1,9 +1,6 @@
+ //
+ //  ProtobufMessage.swift
+-//  OpenSwiftUICore
+-//
+-//  Audited for iOS 18.0
+-//  Status: Complete
++//  ProtobufKit
+ 
+ import Foundation
+ 
+diff --git a/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufDecoderTests.swift b/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufDecoderTests.swift
+index 6cfa17b..a549dcc 100644
+--- a/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufDecoderTests.swift
++++ b/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufDecoderTests.swift
+@@ -1,6 +1,6 @@
+ //
+ //  ProtobufDecoderTests.swift
+-//  OpenSwiftUICoreTests
++//  ProtobufKitTests
+ 
+ import OpenSwiftUICore
+ import Testing
+diff --git a/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufEncoderTests.swift b/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufEncoderTests.swift
+index 510cc54..dcfcd54 100644
+--- a/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufEncoderTests.swift
++++ b/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufEncoderTests.swift
+@@ -1,6 +1,6 @@
+ //
+ //  ProtobufEncoderTests.swift
+-//  OpenSwiftUICoreTests
++//  ProtobufKitTests
+ 
+ import OpenSwiftUICore
+ import Testing
+diff --git a/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufMessageTests.swift b/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufMessageTests.swift
+index e5bb00f..30102ad 100644
+--- a/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufMessageTests.swift
++++ b/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufMessageTests.swift
+@@ -1,6 +1,6 @@
+ //
+ //  ProtobufMessageTests.swift
+-//  OpenSwiftUICoreTests
++//  ProtobufKitTests
+ 
+ import OpenSwiftUICore
+ import Testing
+diff --git a/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufTestHelper.swift b/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufTestHelper.swift
+index 24ccc32..762963f 100644
+--- a/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufTestHelper.swift
++++ b/Tests/OpenSwiftUICoreTests/Data/Protobuf/ProtobufTestHelper.swift
+@@ -1,6 +1,6 @@
+ //
+ //  ProtobufTestHelper.swift
+-//  OpenSwiftUICoreTests
++//  ProtobufKitTests
+ 
+ import Foundation
+ import OpenSwiftUICore
+-- 
+2.47.0
+

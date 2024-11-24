@@ -61,6 +61,8 @@ extension ProtobufDecoder {
                 return packedField
             } else if packedEnd < ptr {
                 throw DecodingError.failed
+            } else {
+                packedField = Field(rawValue: 0)
             }
         }
         let result = try decodeVariant()
@@ -467,7 +469,7 @@ extension ProtobufDecoder {
     /// - Returns: The decodable value resulting from the plist data.
     func value<T>(fromBinaryPlist data: Data, type: T.Type = T.self) throws -> T where T: Decodable {
         #if os(WASI)
-        fatalError("PropertyListDecoder is not avaiable on WASI")
+        preconditionFailure("PropertyListDecoder is not avaiable on WASI")
         #else
         let decoder = PropertyListDecoder()
         decoder.userInfo = userInfo

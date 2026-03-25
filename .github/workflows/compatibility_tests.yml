@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup Xcode
-        uses: maxim-lobanov/setup-xcode@v1
+        uses: OpenSwiftUIProject/setup-xcode@v2
         with:
           xcode-version: ${{ matrix.xcode-version }}
       - name: Run compatibility tests
@@ -42,7 +42,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup Xcode
-        uses: maxim-lobanov/setup-xcode@v1
+        uses: OpenSwiftUIProject/setup-xcode@v2
         with:
           xcode-version: ${{ matrix.xcode-version }}
       - name: Run compatibility tests
